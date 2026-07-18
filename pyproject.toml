@@ -1,0 +1,43 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "pytrex-framework"
+version = "1.0.0"
+description = "PyTreX: Full-Stack AI, Real-Time & Containerized Desktop Framework (Python + Tauri v2 + Rust + Elixir)"
+authors = [{ name = "PyTreX Contributors" }]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "websockets>=11.0",
+    "click>=8.0",
+    "msgpack>=1.0",
+    "transformers>=4.30.0",
+    "watchdog>=3.0.0",
+    "keyring>=24.0.0",
+    "bcrypt>=4.0.0",
+    "fpdf2>=2.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "opencv-python>=4.8.0",
+    "ultralytics>=8.0.0",
+    "maturin>=1.0",
+]
+finetune = [
+    "transformers>=4.30.0",
+    "datasets>=2.0.0",
+    "accelerate>=0.20.0",
+]
+
+[project.scripts]
+pytrex = "pytrex.cli:main"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+include = ["pytrex_engine/_build/prod/rel/pytrex_engine/**/*"]

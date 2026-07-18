@@ -1,0 +1,26 @@
+{
+  "productName": "Smart Retail POS",
+  "version": "1.0.0",
+  "identifier": "com.pytrex.smartretail",
+  "build": {
+    "frontendDist": "frontend",
+    "devUrl": "http://localhost:1420"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Smart Duka POS",
+        "width": 1000,
+        "height": 700,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all"
+  }
+}

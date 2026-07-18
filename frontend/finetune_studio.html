@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PyTreX AI Fine-Tuning Studio</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        h1 { color: #38bdf8; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #94a3b8; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0ea5e9;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #0284c7; }
+        button:disabled { background: #475569; cursor: not-allowed; }
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #020617;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            text-align: center;
+            padding-top: 5px;
+            color: #94a3b8;
+        }
+        #loss_chart {
+            margin-top: 15px;
+            padding: 10px;
+            background: #020617;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #4ade80;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PyTreX AI Fine-Tuning Studio</h1>
+        <p style="text-align:center; color:#94a3b8;">Train AI models locally with live progress via Elixir</p>
+
+        <div class="form-group">
+            <label>JSON Dataset Path:</label>
+            <input type="text" id="dataset_path" value="./my_dataset.json" placeholder="e.g. ./my_dataset.json">
+        </div>
+
+        <div class="form-group">
+            <label>Base Model ID:</label>
+            <input type="text" id="model_id" value="facebook/opt-125m" placeholder="e.g. facebook/opt-125m">
+        </div>
+
+        <div class="form-group">
+            <label>Number of Epochs:</label>
+            <input type="number" id="epochs" value="3" min="1" max="50">
+        </div>
+
+        <div class="form-group">
+            <label>Batch Size:</label>
+            <input type="number" id="batch_size" value="2" min="1" max="32">
+        </div>
+
+        <button id="train_btn" onclick="startTraining()">Start Fine-Tuning</button>
+
+        <div class="progress-container" id="progress_container">
+            <h3 style="color:#38bdf8;">Training Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress_fill"></div>
+            </div>
+            <div class="progress-text" id="progress_text">Step 0 / 50 — Loss: --</div>
+            <div id="loss_chart"></div>
+        </div>
+    </div>
+
+    <script>
+        const invoke = window.__TAURI_INTERNALS__.invoke;
+
+        async function startTraining() {
+            let datasetPath = document.getElementById('dataset_path').value;
+            let modelId = document.getElementById('model_id').value;
+            let epochs = parseInt(document.getElementById('epochs').value);
+            let batchSize = parseInt(document.getElementById('batch_size').value);
+
+            document.getElementById('train_btn').disabled = true;
+            document.getElementById('progress_container').style.display = 'block';
+            document.getElementById('loss_chart').innerHTML = '';
+
+            let jibu = await invoke('tauri_to_python', {
+                eventName: 'start_finetuning',
+                data: JSON.stringify({
+                    dataset_path: datasetPath,
+                    model_id: modelId,
+                    epochs: epochs,
+                    batch_size: batchSize
+                })
+            });
+
+            let result = JSON.parse(jibu);
+            if (result.status === 'error') {
+                document.getElementById('progress_text').innerText = 'Error: ' + result.message;
+                document.getElementById('progress_text').style.color = '#ef4444';
+            }
+            document.getElementById('train_btn').disabled = false;
+        }
+
+        // Listen for training progress events from Elixir
+        if (window.__TAURI_INTERNALS__) {
+            window.__TAURI_INTERNALS__.invoke('listen', { event: 'training_progress' }).then(unlisten => {
+                window.addEventListener('training_progress', (event) => {
+                    let data = event.payload;
+                    let percent = (data.step / 50) * 100;
+                    document.getElementById('progress_fill').style.width = percent + '%';
+                    document.getElementById('progress_text').innerText = `Step ${data.step} / 50 — Loss: ${data.loss}`;
+                    document.getElementById('loss_chart').innerHTML += `Step ${data.step} | Loss: ${data.loss}<br>`;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

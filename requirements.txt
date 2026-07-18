@@ -1,0 +1,49 @@
+# PyTreX Framework — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.30.0
+websockets>=11.0
+click>=8.0
+msgpack>=1.0
+
+# Security
+bcrypt>=4.0.0
+keyring>=24.0.0
+
+# File watching
+watchdog>=3.0.0
+
+# PDF generation
+fpdf2>=2.7.0
+
+# Image processing (PIL/Pillow comes with torchvision)
+# Pillow is already installed as a torchvision dependency
+
+# === PyTreXT Extended: LangChain AI Agents ===
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-openai>=0.2.0
+
+# === PyTreXT Extended: Web Search (SearXNG + DuckDuckGo) ===
+duckduckgo-search>=6.0.0
+
+# === PyTreXT Extended: MCP (Model Context Protocol) ===
+mcp>=1.0.0
+
+# === PyTreXT Extended: Async HTTP ===
+aiohttp>=3.9.0
+httpx>=0.27.0
+
+# Optional — install based on your needs:
+# pip install pyttsx3        # Text-to-Speech (VoiceCloner, TextToSpeech)
+# pip install pytesseract    # OCR (OCREngine) — also requires Tesseract OCR system binary
+# pip install openai-whisper  # Speech-to-Text (whisper model)
+# pip install opencv-python   # Computer Vision (ImageClassifier)
+# pip install ultralytics     # YOLO object detection
+# pip install pyyaml          # YAML config files
+# pip install openpyxl        # Excel export/import
+# pip install psutil          # System monitoring
+# pip install searxng         # SearXNG local metasearch engine (privacy-first)

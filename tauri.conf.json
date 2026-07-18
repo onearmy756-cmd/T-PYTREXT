@@ -1,0 +1,40 @@
+{
+  "productName": "PyTreX",
+  "version": "1.0.0",
+  "identifier": "com.pytrex.framework",
+  "build": {
+    "frontendDist": "frontend",
+    "devUrl": "http://localhost:1420"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "PyTreX App",
+        "width": 900,
+        "height": 700,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "android": {
+      "minSdkVersion": 24,
+      "versionCode": 1
+    },
+    "iOS": {
+      "minimumSystemVersion": "13.0"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": ["https://pytrex.dev/updates/{{target}}/{{current_version}}"],
+      "dialog": true
+    }
+  }
+}

@@ -1,0 +1,85 @@
+# PyTreXT CI/CD Pipeline
+name: PyTreXT Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  APP_NAME: testapp
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install maturin pytest pytest-asyncio
+
+      - name: Build Rust core
+        run: PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 python -m maturin develop
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --tb=short
+          python -m pytrex.test_runner
+
+  build:
+    name: Build & Push
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.APP_NAME }}:${{ github.sha }} -f deploy/Dockerfile .
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            latest
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image
+        run: |
+          docker tag ${{ env.APP_NAME }}:${{ github.sha }} ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:latest
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deployment
+        run: echo "Deploying ${{ env.APP_NAME }} to production..."
+        # Add your deployment step here (SSH, kubectl, etc.)

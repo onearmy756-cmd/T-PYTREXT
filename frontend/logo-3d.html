@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-PYTREXT — 3D Logo</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: #0d1117;
+            --gold: #f0c040;
+            --gold-light: #f7d774;
+            --gold-dark: #c8960c;
+            --neon-blue: #00d4ff;
+            --neon-purple: #a855f7;
+            --neon-green: #22d3a0;
+            --neon-pink: #f472b6;
+            --glass: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            perspective: 1200px;
+        }
+
+        /* ─── Background Particles ─── */
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        /* ─── Main Container ─── */
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* ─── 3D Card Scene ─── */
+        .card-scene {
+            width: 420px;
+            height: 260px;
+            perspective: 1000px;
+            cursor: grab;
+        }
+        .card-scene:active { cursor: grabbing; }
+
+        .card-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.05s ease-out;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            backface-visibility: hidden;
+            overflow: hidden;
+        }
+
+        /* ─── Card Front ─── */
+        .card-front {
+            background: linear-gradient(145deg, #111827, #1a1a2e, #0f0f23);
+            border: 1.5px solid var(--border);
+            box-shadow:
+                0 25px 60px rgba(0,0,0,0.6),
+                0 0 80px rgba(0,212,255,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 28px;
+        }
+
+        /* ─── Glossy overlay ─── */
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                ellipse at 30% 20%,
+                rgba(255,255,255,0.06) 0%,
+                transparent 60%
+            );
+            pointer-events: none;
+        }
+
+        /* ─── Accent lines ─── */
+        .card-front::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 20px;
+            border: 1px solid rgba(240,192,64,0.15);
+            pointer-events: none;
+        }
+
+        /* ─── Icon / Hex Badge ─── */
+        .logo-badge {
+            width: 72px;
+            height: 72px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hex-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2.5px solid var(--gold);
+            border-radius: 18px;
+            transform: rotate(45deg);
+            animation: hexPulse 3s ease-in-out infinite;
+            box-shadow:
+                0 0 20px rgba(240,192,64,0.3),
+                inset 0 0 20px rgba(240,192,64,0.1);
+        }
+        .hex-ring:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            animation-delay: 0.5s;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0,212,255,0.3);
+        }
+        .hex-ring:nth-child(3) {
+            width: 58%;
+            height: 58%;
+            animation-delay: 1s;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 12px rgba(168,85,247,0.3);
+        }
+
+        @keyframes hexPulse {
+            0%,100% { transform: rotate(45deg) scale(1); opacity: 0.9; }
+            50% { transform: rotate(45deg) scale(1.08); opacity: 1; }
+        }
+
+        .logo-text-icon {
+            position: relative;
+            z-index: 3;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        /* ─── Brand Name ─── */
+        .brand-name {
+            position: relative;
+            z-index: 2;
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            background: linear-gradient(
+                135deg,
+                var(--gold-light) 0%,
+                var(--gold) 30%,
+                var(--gold-dark) 50%,
+                var(--gold) 70%,
+                var(--gold-light) 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            text-shadow: none;
+            filter: drop-shadow(0 2px 8px rgba(240,192,64,0.3));
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ─── Subtitle ─── */
+        .subtitle {
+            position: relative;
+            z-index: 2;
+            font-size: 11px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+        }
+
+        /* ─── Tech badges row ─── */
+        .tech-row {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .tech-badge {
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--glass);
+        }
+        .badge-py { color: #ffd43b; border-color: rgba(255,212,59,0.3); }
+        .badge-rs { color: #f74c00; border-color: rgba(247,76,0,0.3); }
+        .badge-ex { color: #a855f7; border-color: rgba(168,85,247,0.3); }
+        .badge-ai { color: #22d3a0; border-color: rgba(34,211,160,0.3); }
+        .badge-mcp { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
+
+        /* ─── Card Back ─── */
+        .card-back {
+            background: linear-gradient(145deg, #111827, #1a1a2e);
+            border: 1.5px solid var(--border);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 28px;
+        }
+        .card-back::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 16px;
+            border: 1px dashed rgba(240,192,64,0.2);
+            pointer-events: none;
+        }
+
+        .back-grid {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            text-align: center;
+            line-height: 2;
+        }
+        .back-grid span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* ─── Reflection ─── */
+        .reflection {
+            width: 400px;
+            height: 60px;
+            margin-top: -10px;
+            opacity: 0.25;
+            background: linear-gradient(
+                to bottom,
+                rgba(240,192,64,0.15),
+                transparent
+            );
+            border-radius: 50%;
+            filter: blur(15px);
+            animation: reflectPulse 3s ease-in-out infinite;
+        }
+        @keyframes reflectPulse {
+            0%,100% { opacity: 0.2; transform: scaleX(0.95); }
+            50% { opacity: 0.35; transform: scaleX(1.05); }
+        }
+
+        /* ─── Controls Info ─── */
+        .controls {
+            color: rgba(255,255,255,0.35);
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .controls kbd {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            padding: 3px 7px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ─── Stats Cards ─── */
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 20px;
+            text-align: center;
+            min-width: 90px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            border-color: rgba(240,192,64,0.3);
+            box-shadow: 0 0 30px rgba(240,192,64,0.08);
+            transform: translateY(-3px);
+        }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 480px) {
+            .card-scene { width: 320px; height: 200px; }
+            .brand-name { font-size: 38px; letter-spacing: 2px; }
+            .subtitle { font-size: 9px; letter-spacing: 4px; }
+            .logo-badge { width: 52px; height: 52px; }
+            .logo-text-icon { font-size: 20px; }
+            .tech-badge { font-size: 7px; padding: 3px 7px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- 3D Card -->
+        <div class="card-scene" id="cardScene">
+            <div class="card-3d" id="card3d">
+                <!-- Front -->
+                <div class="card-face card-front">
+                    <div class="logo-badge">
+                        <div class="hex-ring"></div>
+                        <div class="hex-ring"></div>
+                        <div class="hex-ring"></div>
+                        <span class="logo-text-icon">⚡</span>
+                    </div>
+                    <div class="brand-name">T-PYTREXT</div>
+                    <div class="subtitle">Python · Rust · Elixir · AI</div>
+                    <div class="tech-row">
+                        <span class="tech-badge badge-py">Python</span>
+                        <span class="tech-badge badge-rs">Rust</span>
+                        <span class="tech-badge badge-ex">Elixir</span>
+                        <span class="tech-badge badge-ai">AI/ML</span>
+                        <span class="tech-badge badge-mcp">MCP</span>
+                    </div>
+                </div>
+                <!-- Back -->
+                <div class="card-face card-back">
+                    <div style="color:var(--gold);font-size:18px;font-weight:800;letter-spacing:3px;">FRAMEWORK</div>
+                    <div class="back-grid">
+                        ⚡ <span>Ultra-Fast</span> Desktop Apps<br>
+                        🧠 <span>On-Device AI</span> Engine<br>
+                        🔗 <span>Blockchain</span> Security<br>
+                        🌐 <span>MCP Protocol</span> Ready<br>
+                        🔒 <span>AES-256</span> Encryption
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reflection -->
+        <div class="reflection"></div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value">481+</div>
+                <div class="stat-label">Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">200+</div>
+                <div class="stat-label">Classes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Engines</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Languages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">v1.0</div>
+                <div class="stat-label">Version</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <span>🖱️ <kbd>Drag</kbd> to rotate</span>
+            <span>🔄 <kbd>R</kbd> reset</span>
+            <span>🔄 <kbd>F</kbd> flip</span>
+        </div>
+    </div>
+
+    <script>
+        // ─── Particles ───
+        const particlesContainer = document.getElementById('particles');
+        const colors = ['#00d4ff', '#a855f7', '#f0c040', '#22d3a0', '#f472b6'];
+
+        for (let i = 0; i < 40; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + '%';
+            p.style.width = p.style.height = (Math.random() * 3 + 1) + 'px';
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            particlesContainer.appendChild(p);
+        }
+
+        // ─── 3D Card Rotation ───
+        const cardScene = document.getElementById('cardScene');
+        const card3d = document.getElementById('card3d');
+        let rotX = -5, rotY = 15;
+        let targetRotX = rotX, targetRotY = rotY;
+        let isDragging = false;
+        let startX, startY, startRotX, startRotY;
+        let isFlipped = false;
+        let autoRotate = true;
+
+        function updateCard() {
+            const flip = isFlipped ? 180 : 0;
+            card3d.style.transform =
+                `rotateX(${rotX}deg) rotateY(${rotY + flip}deg)`;
+        }
+
+        // Mouse drag
+        cardScene.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            startRotX = rotX;
+            startRotY = rotY;
+            cardScene.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            rotX = startRotX - dy * 0.4;
+            rotY = startRotY + dx * 0.4;
+            rotX = Math.max(-40, Math.min(40, rotX));
+            rotY = Math.max(-50, Math.min(50, rotY));
+            updateCard();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            cardScene.style.cursor = 'grab';
+            setTimeout(() => { autoRotate = true; }, 2000);
+        });
+
+        // Touch support
+        cardScene.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startRotX = rotX;
+            startRotY = rotY;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            rotX = startRotX - dy * 0.4;
+            rotY = startRotY + dx * 0.4;
+            rotX = Math.max(-40, Math.min(40, rotX));
+            rotY = Math.max(-50, Math.min(50, rotY));
+            updateCard();
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+            setTimeout(() => { autoRotate = true; }, 2000);
+        });
+
+        // Keyboard controls
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                rotX = -5; rotY = 15;
+                isFlipped = false;
+                updateCard();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                isFlipped = !isFlipped;
+                updateCard();
+            }
+        });
+
+        // Auto-rotate animation
+        function animate() {
+            if (autoRotate) {
+                rotY += 0.15;
+                rotX += Math.sin(Date.now() * 0.001) * 0.02;
+                rotX = Math.max(-12, Math.min(12, rotX));
+                updateCard();
+            }
+            // Smooth lerp for non-drag
+            if (!isDragging) {
+                rotX += (targetRotX - rotX) * 0.05;
+                rotY += (targetRotY - rotY) * 0.05;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        updateCard();
+        animate();
+    </script>
+</body>
+</html>

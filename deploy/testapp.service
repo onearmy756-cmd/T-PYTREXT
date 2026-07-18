@@ -1,0 +1,39 @@
+[Unit]
+Description=PyTreXT testapp Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pytrex
+Group=pytrex
+WorkingDirectory=/opt/testapp
+ExecStart=/opt/testapp/run.sh
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=testapp
+
+# Environment
+Environment=PYTREX_ENV=production
+Environment=PYTREX_PORT=8080
+Environment=PYTREX_LOG_LEVEL=INFO
+EnvironmentFile=-/etc/testapp/env
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/testapp /data
+ReadOnlyPaths=/usr /etc/testapp
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictRealtime=yes
+MemoryLimit=512M
+
+[Install]
+WantedBy=multi-user.target

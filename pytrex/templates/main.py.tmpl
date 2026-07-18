@@ -1,0 +1,17 @@
+# main.py — {project_name}
+from pytrex import PyTreXApp, event
+import json
+
+
+class App(PyTreXApp):
+    def __init__(self):
+        super().__init__(name="{project_name}")
+
+    @event("ping")
+    def ping(self, data):
+        return json.dumps({{"status": "pong", "received": data}})
+
+
+if __name__ == "__main__":
+    app = App()
+    app.run()

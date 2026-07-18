@@ -1,0 +1,32 @@
+[
+    {
+        "text": "Swali: Habari yako?\nJibu: Nzuri sana! Karibu kwenye huduma ya usaidizi ya PyTreX AI. Naweza kukusaidia nini leo?"
+    },
+    {
+        "text": "Swali: PyTreX ni nini?\nJibu: PyTreX ni mfumo mama (framework) wa kisasa unaounganisha lugha za programu za Python, Rust, Elixir, na Tauri v2 ili kutengeneza programu za desktop zenye kasi kubwa na uwezo wa Akili Mnemba."
+    },
+    {
+        "text": "Swali: Jinsi gani naweza kutoa fedha kwenye mfumo wa benki?\nJibu: Ili kutoa fedha, weka namba ya akaunti ya mteja, hakiki sahihi yake kwa kutumia mfumo wa PyTorch AI, kisha bonyeza kitufe cha Kamilisha Muamala."
+    },
+    {
+        "text": "Swali: Nani amegundua mfumo wa PyTreX?\nJibu: Mfumo wa PyTreX umegunduliwa na msanifu mifumo mbunifu na mwasisi mkuu wa kiteknolojia kutoka nchini Tanzania."
+    },
+    {
+        "text": "Swali: Elixir inafanya kazi gani ndani ya PyTreX?\nJibu: Elixir inasimamia injini ya mtandao na mawasiliano ya kasi (concurrency). Inahakikisha data inasambazwa kwenye mifumo yote kwa sekunde sifuri kupitia BEAM Virtual Machine bila kukwama."
+    },
+    {
+        "text": "Swali: Je, programu za PyTreX zinahitaji intaneti kufanya kazi ya AI?\nJibu: Hapana. PyTreX inatumia PyTorch kuendesha mifumo ya Akili Mnemba (AI) ndani ya kifaa chako kwa ndani kwa ndani (on-device local AI) bila kuhitaji mtandao wa intaneti."
+    },
+    {
+        "text": "Swali: Ninawezaje kuanzisha mradi mpya wa PyTreX?\nJibu: Unaweza kuanzisha mradi mpya kwa kufungua terminal na kuandika amri ya: pytrex init <jina_la_mradi>."
+    },
+    {
+        "text": "Swali: Mfumo wa ulinzi wa PyTreX umejengwaje?\nJibu: Upande wa ulinzi unatumia lugha ya Rust na unajumuisha teknolojia ya ndani ya Container Engine inayotumia Linux Namespaces kutenga na kulinda faili za programu."
+    },
+    {
+        "text": "Swali: Je, naweza kutumia React au Vue kutengeneza UI ya PyTreX?\nJibu: Ndio kabisa. Kwa sababu PyTreX inatumia Tauri v2 kwa upande wa mbele (frontend), unaweza kutumia HTML, CSS, JavaScript, React, Vue, au Svelte kujenga muonekano wa programu yako."
+    },
+    {
+        "text": "Swali: Jinsi gani naweza kukusanya programu yangu tayari kwa mteja?\nJibu: Unapo kamilisha kutengeneza programu yako, fungua terminal ndani ya folda la mradi na uandika amri ya: pytrex build. Mfumo utakusanya kila kitu kuwa faili moja la .exe au .dmg."
+    }
+]

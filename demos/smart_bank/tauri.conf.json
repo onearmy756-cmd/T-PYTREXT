@@ -1,0 +1,26 @@
+{
+  "productName": "Smart Bank",
+  "version": "1.0.0",
+  "identifier": "com.pytrex.smartbank",
+  "build": {
+    "frontendDist": "frontend",
+    "devUrl": "http://localhost:1420"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "PyTreX National Bank (POS)",
+        "width": 700,
+        "height": 800,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all"
+  }
+}

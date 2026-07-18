@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PyTreX Smart Bank Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 30px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+        }
+        h1 { text-align: center; color: #38bdf8; font-size: 24px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #94a3b8; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0ea5e9;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover { background: #0284c7; }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #020617;
+            border-left: 4px solid #38bdf8;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PyTreX National Bank (POS)</h1>
+
+        <div class="form-group">
+            <label>Customer Account Number:</label>
+            <input type="text" id="acc_no" placeholder="e.g. 100200300">
+        </div>
+
+        <button onclick="tafutaAkaunti()">Fetch Account</button>
+
+        <div id="section_muamala" style="display:none; margin-top: 20px; border-top: 1px solid #475569; padding-top: 20px;">
+            <h3 style="color:#38bdf8;">Process Transaction</h3>
+            <p>Customer: <span id="jina_mteja" style="font-weight:bold;"></span></p>
+            <p>Current Balance: <span id="salio_mteja" style="color:#4ade80; font-weight:bold;"></span> TZS</p>
+
+            <div class="form-group">
+                <label>Transaction Type:</label>
+                <select id="aina_muamala">
+                    <option value="deposit">Deposit</option>
+                    <option value="withdraw">Withdraw</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Amount (TZS):</label>
+                <input type="number" id="kiwango_fedha" placeholder="e.g. 50000">
+            </div>
+
+            <button style="background:#e11d48;" onclick="hakikiSahihiAI()">Step 1: Verify Signature (PyTorch AI)</button>
+            <button id="btn_kamilisha" style="background:#16a34a; display:none;" onclick="kamilishaMuamala()">Step 2: Complete Transaction (Blockchain + Elixir Sync)</button>
+        </div>
+
+        <div class="result-box" id="kasha_la_majibu"></div>
+    </div>
+
+    <script>
+        const invoke = window.__TAURI_INTERNALS__.invoke;
+
+        async function tajaPython(eventName, data) {
+            let response = await invoke('tauri_to_python', {
+                eventName: eventName,
+                data: JSON.stringify(data)
+            });
+            return JSON.parse(response);
+        }
+
+        async function tafutaAkaunti() {
+            let accNo = document.getElementById('acc_no').value;
+            let jibu = await tajaPython('pata_akaunti', { account_number: accNo });
+
+            let resBox = document.getElementById('kasha_la_majibu');
+            if (jibu.status === "success") {
+                document.getElementById('section_muamala').style.display = 'block';
+                document.getElementById('jina_mteja').innerText = jibu.data.jina;
+                document.getElementById('salio_mteja').innerText = jibu.data.salio.toLocaleString();
+                resBox.style.display = 'none';
+            } else {
+                document.getElementById('section_muamala').style.display = 'none';
+                resBox.style.display = 'block';
+                resBox.style.color = '#ef4444';
+                resBox.innerText = jibu.message;
+            }
+        }
+
+        async function hakikiSahihiAI() {
+            let jibu = await tajaPython('hakiki_sahihi', "signature_image_bytes_here");
+            let resBox = document.getElementById('kasha_la_majibu');
+            resBox.style.display = 'block';
+
+            if (jibu.status === "verified") {
+                resBox.style.color = '#4ade80';
+                resBox.innerText = `[AI SUCCESS] Signature matches at ${jibu.score}%. Authorization granted!`;
+                document.getElementById('btn_kamilisha').style.display = 'block';
+            } else {
+                resBox.style.color = '#ef4444';
+                resBox.innerText = `[AI ALERT] Signature mismatch (Match: ${jibu.score}%). Transaction blocked!`;
+                document.getElementById('btn_kamilisha').style.display = 'none';
+            }
+        }
+
+        async function kamilishaMuamala() {
+            let accNo = document.getElementById('acc_no').value;
+            let kiwango = document.getElementById('kiwango_fedha').value;
+            let aina = document.getElementById('aina_muamala').value;
+
+            let jibu = await tajaPython('fanya_muamala', {
+                account_number: accNo,
+                amount: kiwango,
+                type: aina
+            });
+            let resBox = document.getElementById('kasha_la_majibu');
+
+            if (jibu.status === "success") {
+                resBox.style.color = '#4ade80';
+                resBox.innerText = `[SAFE] Transaction complete. New Balance: ${jibu.new_balance.toLocaleString()} TZS. Block imetengenezwa na Elixir imesambaza!`;
+                document.getElementById('salio_mteja').innerText = jibu.new_balance.toLocaleString();
+                document.getElementById('btn_kamilisha').style.display = 'none';
+            } else {
+                resBox.style.color = '#ef4444';
+                resBox.innerText = `[ERROR]: ${jibu.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

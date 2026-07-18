@@ -1,0 +1,49 @@
+{
+  "framework": "PyTreXT",
+  "version": "1.0.0",
+  "total_projects": 2,
+  "projects": [
+    {
+      "name": "smart_bank",
+      "path": "C:\\PYTREX-master\\demos\\smart_bank",
+      "main_file": "main.py",
+      "has_frontend": true,
+      "has_tauri_conf": true,
+      "has_blockchain": true,
+      "has_database": true,
+      "events": [
+        "pata_akaunti",
+        "hakiki_sahihi",
+        "fanya_muamala",
+        "endesha_audit_usalama"
+      ],
+      "has_elixir": false,
+      "description": "Insert demo accounts into SQLx database if they don't exist.",
+      "last_modified": 1784370869.335907,
+      "size_kb": 10.7
+    },
+    {
+      "name": "smart_retail",
+      "path": "C:\\PYTREX-master\\demos\\smart_retail",
+      "main_file": "main.py",
+      "has_frontend": true,
+      "has_tauri_conf": true,
+      "has_blockchain": false,
+      "has_database": false,
+      "events": [
+        "scan_product"
+      ],
+      "has_elixir": false,
+      "description": "",
+      "last_modified": 1784370869.3691542,
+      "size_kb": 6.6
+    }
+  ],
+  "scanned_dirs": [
+    "C:\\PYTREX-master",
+    "C:\\Users\\DR MBILINYI",
+    "C:\\Users\\DR MBILINYI/Documents",
+    "C:\\"
+  ],
+  "exported_at": "2026-07-18T14:46:35"
+}
