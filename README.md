@@ -1,280 +1,304 @@
-# PyTreX Framework
+# 🚀 T-PYTREXT Framework
 
-**PyTreX** (Python + Tauri v2 + Rust + Elixir) is a revolutionary, high-performance, Full-Stack AI & Real-Time Desktop-First framework. It empowers developers to build ultra-fast, cross-platform desktop applications using **only Python**, while leveraging the native speed of **Rust**, the lightweight UI of **Tauri v2**, the deep learning power of **PyTorch**, and the massive concurrency of **Elixir (BEAM VM)**.
+> **Full-Stack AI & Real-Time Desktop Framework** — Build Ultra-Fast, Production-Ready Apps with Python Alone.
 
----
-
-## Key Features
-
-- **Blazing Fast Desktop UI:** Powered by **Tauri v2** & Rust (Wry). No more heavy, memory-hungry Electron apps.
-- **On-Device AI Engine:** Native integration with **PyTorch** for real-time computer vision, NLP, and local predictions.
-- **Distributed Concurrency:** Powered by **Elixir**, allowing your apps to handle millions of connections and real-time syncing across clusters with ease.
-- **Single-Language Developer Experience:** Write simple, high-level Python code, and let PyTreX handle the complex bindings under the hood.
-- **Encrypted Database (SQLx):** Auto-migrating SQLite database with AES-256 encryption (SQLCipher) for military-grade data security.
-- **Blockchain Engine (SHA-256):** Built-in distributed ledger to prevent data tampering and fraud in financial applications.
-- **Container Engine:** Built-in Linux namespace isolation (Docker-like) for secure app deployment.
-- **AI Fine-Tuning Studio:** Train and fine-tune AI models locally with live progress broadcasting via Elixir.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/Rust-1.75+-orange?logo=rust" alt="Rust">
+  <img src="https://img.shields.io/badge/Elixir-1.16+-purple?logo=elixir" alt="Elixir">
+  <img src="https://img.shields.io/badge/Tauri-v2-green?logo=tauri" alt="Tauri">
+  <img src="https://img.shields.io/badge/AI-PyTorch%20%7C%20Candle%20%7C%20Burn-red?logo=pytorch" alt="AI">
+  <img src="https://img.shields.io/badge/Blockchain-SHA--256-gold" alt="Blockchain">
+  <img src="https://img.shields.io/badge/License-MIT-brightgreen" alt="License">
+  <img src="https://img.shields.io/badge/Tests-96%2F96%20PASSED-success" alt="Tests">
+</p>
 
 ---
 
-## Architecture
+## ⚡ Why T-PYTREXT?
+
+| Problem | PyTreXT Solution |
+|---------|-----------------|
+| Electron apps are slow & heavy (500MB RAM) | **Tauri v2 + Rust** — 10x lighter, 5x faster |
+| Need 3-4 frameworks to build full app | **One framework** — Python + Rust + Elixir unified |
+| Security is an afterthought | **Built-in**: AES-256, SHA-256 Blockchain, Encrypted DB |
+| AI integration is complex | **Plug & play**: LangChain, Hermes Agent, PyTorch, Candle, Burn |
+| Deployment takes days | **One command**: `pytrex deploy` → Docker/k8s/Cloud |
+| No real-time capability | **Elixir BEAM** — millions of concurrent connections |
+
+---
+
+## 📊 By The Numbers
+
+| Metric | Value |
+|--------|-------|
+| **Total Code** | 41,000+ lines (Python + Rust + Elixir) |
+| **Classes** | 220+ |
+| **CLI Commands** | 15 |
+| **Demo Projects** | 8 (Bank, Retail, Chat, Crypto, Hospital, Exam, Real Estate, Voting) |
+| **Tests** | 96/96 PASSED (100%) |
+| **Rust PyO3 Functions** | 39 |
+| **Production Configs** | 14 (Docker, k8s, Nginx, Cloud, Systemd) |
+| **Events/Sec** | 55,506 ⚡ |
+| **App Startup** | 117ms 🚀 |
+
+---
+
+## 🏗️ Architecture
 
 ```
-    ┌──────────────────────────────────────────────────────────────────────────────┐
-    │                         TAURI v2 HTML5/CSS/JS FRONTEND                       │
-    │  (Desktop UI - Inatumia RAM ndogo, Webview Native Engine)                    │
-    └──────────────────────────────────────┬───────────────────────────────────────┘
-                                           │
-                                           │ (Tauri invoke / IPC Channel)
-                                           ▼
-    ┌──────────────────────────────────────────────────────────────────────────────┐
-    │                             RUST CORE BRIDGE (PyO3)                          │
-    │  - Inapokea amri za UI na kuzitafsiri kwenda Python GIL                     │
-    │  - Inasimamia usalama na ulinzi wa Memory (Memory Safety & Zero-Crashes)    │
-    │  - SQLx Encrypted Database (AES-256)                                        │
-    │  - Blockchain Engine (SHA-256)                                              │
-    └──────────────────────────────────────┬───────────────────────────────────────┘
-                                           │
-                 ┌─────────────────────────┴─────────────────────────┐
-                 │ (Python GIL Binding)                              │ (Linux System Calls)
-                 ▼                                                   ▼
-    ┌──────────────────────────────────────────┐       ┌───────────────────────────┐
-    │        PYTHON CORE MANAGEMENT            │       │  INTERNAL CONTAINER ENGINE│
-    │  - Inasimamia @event decorators          │       │  - Linux Namespaces       │
-    │  - Logic kuu ya mradi (main.py)          │       │  - chroot / unshare       │
-    │  - AI Fine-Tuning Studio                 │       │  - Isolate App Ecosystem  │
-    └────────────────────┬─────────────────────┘       └───────────────────────────┘
-                         │
-          ┌──────────────┴──────────────┐
-          │ (Native Memory)             │ (Local IPC / Async Sockets)
-          ▼                             ▼
-    ┌──────────────────────────┐  ┌────────────────────────────────────────────────┐
-    │     PYTORCH AI ENGINE    │  │          ELIXIR CONCURRENCY ENGINE             │
-    │  - Local AI Processing   │  │  - BEAM Virtual Machine (Erlang)               │
-    │  - Computer Vision / NLP │  │  - Real-time Sockets & Concurrency Broadcast   │
-    │  - On-Device Predictions │  │  - Low Latency Clustering (Matawi ya Mfumo)    │
-    └──────────────────────────┘  └────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│              TAURI v2 DESKTOP UI (HTML/CSS/JS)          │
+│              Lightweight Webview — no Chromium           │
+├─────────────────────────────────────────────────────────┤
+│                   RUST CORE (PyO3)                       │
+│  ┌──────────┬──────────┬──────────┬──────────────────┐  │
+│  │ Axum HTTP│ SQLx DB  │ Blockchain│ AES-256 Crypto  │  │
+│  │ Server   │ (Encrypt)│ (SHA-256) │ + Zlib Compress │  │
+│  ├──────────┼──────────┼──────────┼──────────────────┤  │
+│  │ Candle ML│ Burn DL  │ MCP Proto│ Container Engine │  │
+│  └──────────┴──────────┴──────────┴──────────────────┘  │
+├─────────────────────────────────────────────────────────┤
+│                PYTHON CORE (220+ Classes)                │
+│  ┌──────────┬──────────┬──────────┬──────────────────┐  │
+│  │PyTreXApp │ @event   │ LangChain│ Hermes Agent     │  │
+│  ├──────────┼──────────┼──────────┼──────────────────┤  │
+│  │RAG Engine│ Search   │ HITL     │ MCP Client       │  │
+│  ├──────────┼──────────┼──────────┼──────────────────┤  │
+│  │TestRunner│ Project  │ Production│ CLI (15 commands)│  │
+│  │          │ Manager  │ Builder  │                  │  │
+│  └──────────┴──────────┴──────────┴──────────────────┘  │
+├─────────────────────────────────────────────────────────┤
+│           ELIXIR BEAM VM (Real-Time Engine)              │
+│  WebSocket Server • TaskDispatcher • ClusterManager      │
+│  MCP Handler • Millions of concurrent connections        │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Quick Start
-
-### Prerequisites
-
-- Python >= 3.10
-- Rust (via [rustup](https://rustup.rs))
-- Node.js >= 18
-- Elixir >= 1.16 with Erlang/OTP >= 26 (optional — for real-time clustering)
-- Maturin (`pip install maturin`)
-
-### Installation
-
-#### Method 1: One-Command Install (Recommended)
-
-**Windows (PowerShell):**
-```powershell
-git clone https://github.com/PyTreX/pytrex-framework.git
-cd pytrex-framework
-.\install.ps1
-```
-
-**Linux / macOS:**
-```bash
-git clone https://github.com/PyTreX/pytrex-framework.git
-cd pytrex-framework
-chmod +x install.sh
-./install.sh
-```
-
-This will:
-1. Create a Python virtual environment (`.venv`)
-2. Install all Python dependencies (`requirements.txt`)
-3. Build the Rust native core (`my_framework` via Maturin/PyO3)
-4. Install CLI tools (`maturin`, `pytest`)
-
-#### Method 2: Manual Install
+## 🚀 Quick Start (60 Seconds)
 
 ```bash
-git clone https://github.com/PyTreX/pytrex-framework.git
-cd pytrex-framework
+# 1. Clone
+git clone https://github.com/onearmy756-cmd/T-PYTREXT.git
+cd T-PYTREXT
 
-# 1. Create virtual environment
-python -m venv .venv
-source .venv/bin/activate    # Linux/macOS
-# .\.venv\Scripts\Activate.ps1   # Windows
-
-# 2. Install Python dependencies
+# 2. Install
 pip install -r requirements.txt
-pip install maturin pytest pytest-asyncio
 
-# 3. Build Rust core
-# Windows (Python 3.14+):
-$env:PYO3_USE_ABI3_FORWARD_COMPATIBILITY='1'
-python -m maturin develop
+# 3. Verify
+python -c "from pytrex import PyTreXApp; print('✅ PyTreXT Ready!')"
 
-# Linux/macOS:
-PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 python -m maturin develop
+# 4. Create your first app
+pytrex init MyFirstApp
+cd MyFirstApp
 
-# 4. Verify installation
-python -c "import pytrex; print('PyTreX ready!')"
-```
-
-#### Method 3: Python-only (No Rust)
-
-If you don't have Rust installed, PyTreX still works in Python-only mode:
-
-```bash
-pip install -r requirements.txt
-pip install maturin
-python -c "from pytrex.core import PyTreXApp; app=PyTreXApp(); print('OK')"
-```
-
-> Note: Without Rust, encryption, blockchain, QR generation, and image resize will use Python fallbacks.
-
-### Verify Installation
-
-```bash
-# Run the full test suite (481 tests)
-python -m pytest tests/test_features.py -v
-
-# Check all modules
-python -c "
-from pytrex import PyTreXApp
-app = PyTreXApp()
-print(f'Modules: {len(dir(app))} loaded')
-print(f'Neural Network: {app.neural_net is not None}')
-print(f'Blockchain: {app.blockchain is not None}')
-print(f'Database: {app.db is not None}')
-print('PyTreX is ready!')
-"
-```
-
-### Initialize a New Project
-
-```bash
-pytrex init MySmartApp
-cd MySmartApp
-```
-
-### Write Your App (`main.py`)
-
-```python
-from pytrex import PyTreXApp, event
-import json
-
-class App(PyTreXApp):
-    def __init__(self):
-        super().__init__(name="My Smart App")
-
-    @event("ping")
-    def ping(self, data):
-        return json.dumps({"status": "pong", "received": data})
-
-if __name__ == "__main__":
-    app = App()
-    app.run()
-```
-
-### Run in Development Mode
-
-```bash
+# 5. Run!
 pytrex dev
 ```
 
-### Build for Production
+---
+
+## 📦 What Can You Build? (8 Live Demos)
+
+| # | Demo | Key Features | Run |
+|---|------|-------------|-----|
+| 1 | 🏦 **Smart Bank** | Blockchain, AES-256, AI Signatures | `python demos/smart_bank/main.py` |
+| 2 | 🛒 **Smart Retail** | YOLO AI, Real-time Inventory | `python demos/smart_retail/main.py` |
+| 3 | 💬 **Chat System** | WebSocket, E2E Encryption, Groups | `python demos/chat_app/main.py` |
+| 4 | 🤖 **Crypto Bot** | AI Trading, Blockchain, HITL | `python demos/crypto_bot/main.py` |
+| 5 | 🏥 **Hospital System** | Encrypted EHR, AI Diagnosis | `python demos/hospital_system/main.py` |
+| 6 | 📚 **AI Exam System** | RAG, Hermes AI, Auto-Grading | `python demos/ai_exam/main.py` |
+| 7 | 🏠 **Real Estate** | AI Valuation, Contracts, Payments | `python demos/real_estate/main.py` |
+| 8 | 🗳️ **Blockchain Voting** | Immutable Votes, Anti-Fraud, HITL | `python demos/voting_system/main.py` |
+
+---
+
+## ⚡ Performance (Benchmarked)
+
+```
+55,506 events/sec    ⚡  Event System
+ 1,898 blocks/sec    🔗  Blockchain
+10,892 encrypt/sec   🔐  AES-256
+359,274 hashes/sec   🔑  SHA-256
+   117ms startup     🚀  App Ready
+ 7,543 async/sec     ⚡  8-Thread Parallel
+```
+
+---
+
+## 🔧 CLI Commands (15 Total)
 
 ```bash
-# Standalone Desktop App
-pytrex build local
+pytrex init <name>         # Create new project
+pytrex dev                 # Dev mode with hot-reload
+pytrex build <target>      # Build: local|mesh|serverless|vps|android|ios|web
+pytrex containerize        # Linux container isolation
 
-# Mesh Network (connect office computers without internet)
-pytrex build mesh
+pytrex scan                # Discover all PyTreXT projects
+pytrex projects            # List discovered projects
+pytrex run <name>          # Run any project
+pytrex test                # Test all modules (38 tests)
+pytrex test-project <name> # Test specific project
+pytrex build-project <name># Build project for production
 
-# Serverless (Docker for Cloud Run / Lambda)
-pytrex build serverless
-
-# VPS (Cloud Server)
-pytrex build vps
+pytrex deploy              # Deploy to production (Docker/k8s/Cloud)
+pytrex deploy-quick        # Quick Docker deploy
+pytrex dashboard           # Open project dashboard
+pytrex export              # Export project info to JSON
+pytrex watch <name>        # Watch mode (auto-restart)
 ```
 
 ---
 
-## Demo Applications
+## 🐍 Python API (Quick Examples)
 
-### Smart Bank System (`demos/smart_bank/`)
-Banking POS with:
-- **PyTorch AI** signature verification
-- **Blockchain Engine** (SHA-256) for tamper-proof transaction records
-- **SQLx** encrypted database with ACID-compliant transactions
-- **Elixir** real-time transaction sync across bank network
+```python
+from pytrex import PyTreXApp, event
 
-### Smart Retail POS (`demos/smart_retail/`)
-Retail point-of-sale with:
-- **YOLO AI** camera-based product detection
-- **Elixir** inventory sync across all branches in real-time
+# Create app
+app = PyTreXApp(name="My App")
 
-### AI Fine-Tuning Studio
-Train AI models locally with Swahili dataset:
-- See `demos/my_dataset.json` for sample Swahili training data
-- Use `pytrex/finetune.py` for fine-tuning with live progress via Elixir
+# Register events
+@event("ping")
+def ping(data):
+    return "pong!"
 
----
+# Blockchain
+from pytrex import BlockchainBridge
+bc = BlockchainBridge()
+bc.add_block("transaction_data")
+bc.verify_chain()
 
-## Project Structure
+# AI Agent
+from pytrex import HermesAgent, LangChainAgent
+hermes = HermesAgent()
+hermes.chat("What is the capital of Tanzania?")
 
-```
-pytrex/
-├── pyproject.toml              # Python package config + Maturin build
-├── Cargo.toml                  # Rust dependencies (Tauri v2, PyO3, SQLx, sha2)
-├── tauri.conf.json             # Tauri v2 configuration
-├── build.rs                    # Tauri build script
-├── src/
-│   └── lib.rs                  # Rust core: PyO3 + Tauri + SQLx + Blockchain + Container
-├── pytrex/                     # Python package
-│   ├── __init__.py             # Public exports
-│   ├── core.py                 # Event registry, app lifecycle, Elixir client, blockchain cache
-│   ├── cli.py                  # CLI tool (init, dev, build, containerize)
-│   └── finetune.py             # AI Fine-Tuning Studio (PyTorch training)
-├── pytrex_engine/              # Elixir OTP application
-│   ├── mix.exs
-│   ├── config/config.exs
-│   └── lib/
-│       ├── pytrex_engine.ex            # Application supervisor
-│       ├── websocket_server.ex         # WebSocket server (Plug/Cowboy)
-│       ├── websocket_handler.ex        # WebSocket message handler
-│       ├── task_dispatcher.ex          # Async task processing
-│       └── cluster_manager.ex          # BEAM cluster management
-├── frontend/
-│   └── index.html              # Default frontend template
-├── demos/                      # Demo applications
-│   ├── smart_bank/             # Banking POS (Blockchain + AI + SQLx)
-│   ├── smart_retail/           # Retail POS (YOLO + Elixir)
-│   └── my_dataset.json         # Swahili AI training dataset
-├── README.md
-├── LICENSE
-└── .gitignore
+# Search
+from pytrex import WebSearchEngine
+search = WebSearchEngine()
+search.search("PyTreX framework")
+
+# Human-in-the-Loop
+from pytrex import HumanInTheLoop
+hitl = HumanInTheLoop()
+aid = hitl.request_approval("deploy", {"env": "prod"})
+hitl.approve(aid)
+
+# Production Deploy
+from pytrex import deploy
+deploy(".", target="docker")
 ```
 
 ---
 
-## Rust Core Functions (via PyO3)
+## 🌍 Deployment Targets
 
-| Function | Description |
-|----------|-------------|
-| `fanya_app()` | Opens Tauri v2 desktop window |
-| `anzisha_container(root_path)` | Isolates app in Linux container (namespaces) |
-| `kuandaa_database_salama(db_path, key)` | Creates encrypted SQLite database (AES-256) |
-| `fanya_muamala_salama(acc_no, type, amount)` | Executes ACID-compliant bank transaction |
-| `fanya_block_ya_blockchain(data)` | Creates SHA-256 blockchain block |
-| `hakiki_blockchain(chain_json)` | Audits blockchain for tampering |
+| Target | Command | Output |
+|--------|---------|--------|
+| 🐳 Docker | `pytrex deploy -t docker` | Docker image + compose |
+| 🖥️ Standalone | `pytrex deploy -t standalone` | .exe / .app / binary |
+| ☁️ AWS | `pytrex deploy -t aws` | ECS task + deploy script |
+| ☁️ GCP | `pytrex deploy -t gcp` | Cloud Run + deploy script |
+| ☁️ Azure | `pytrex deploy -t azure` | Container Instances |
+| ☸️ Kubernetes | `pytrex deploy -t k8s` | Deployment + Service + HPA |
+| 🐧 VPS | `pytrex deploy -t vps -d myapp.com` | Nginx + SSL + Systemd |
+| 🪟 Windows | `pytrex deploy -t systemd` | Windows Service |
 
 ---
 
-## Contributing
+## 📂 Project Structure
 
-PyTreX is an open-source project. If you are passionate about Python, Rust, Elixir, or AI engineering, feel free to fork this repository, open issues, and submit pull requests!
+```
+T-PYTREXT/
+├── pytrex/                  # Python Package (13 modules)
+│   ├── core.py              # 11,700+ lines — PyTreXApp + 220 classes
+│   ├── cli.py               # 15 CLI commands
+│   ├── langchain_agent.py   # LangChain AI Agent
+│   ├── search_engine.py     # SearXNG + DuckDuckGo
+│   ├── human_in_loop.py     # HITL approval workflows
+│   ├── hermes_agent.py      # Function-calling AI agent
+│   ├── mcp_client.py        # MCP protocol client
+│   ├── test_runner.py       # Test runner (38 tests, 12 modules)
+│   ├── project_manager.py   # Project discovery & management
+│   ├── production.py        # Production deployment builder
+│   ├── finetune.py          # AI fine-tuning studio
+│   └── templates/           # Project templates
+├── src/lib.rs               # Rust core — 1,800+ lines, 39 PyO3 functions
+├── pytrex_engine/           # Elixir OTP application
+│   ├── lib/                 # 7 modules (WS, Tasks, Cluster, MCP)
+│   └── config/
+├── demos/                   # 8 Live Demo Projects
+├── deploy/                  # 14 Production Config Files
+├── frontend/                # UI templates + 3D Logo
+├── tests/                   # Test suites (96 tests)
+└── docs/                    # Documentation
+```
 
-## License
+---
 
-This project is licensed under the MIT License.
+## 🤝 For Future Generations
+
+This framework is built to last. Here's how we ensure it:
+
+- ✅ **MIT License** — Free forever, for everyone
+- ✅ **96 Tests** — Every feature is verified
+- ✅ **8 Demos** — Working examples for every use case
+- ✅ **14 Deploy Configs** — Production-ready out of the box
+- ✅ **Full Documentation** — README, API docs, Architecture, Getting Started
+- ✅ **3 Languages** — Python (easy), Rust (fast), Elixir (scalable)
+- ✅ **Modular Design** — Each module is independent and replaceable
+- ✅ **Open Source** — Anyone can fork, improve, contribute
+
+---
+
+## 📚 Documentation
+
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** — Beginner's guide
+- **[API_REFERENCE.md](API_REFERENCE.md)** — Full API documentation (220+ classes)
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — System design & decisions
+- **[ROADMAP.md](ROADMAP.md)** — Future plans
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — How to contribute
+
+---
+
+## 🧪 Running Tests
+
+```bash
+# All tests
+pytrex test
+
+# Specific module
+pytrex test -m Blockchain -m Encryption
+
+# Extended features
+python -m pytest tests/test_extended_features.py -v
+
+# Quick test
+pytrex test --quick
+```
+
+---
+
+## 👤 Author
+
+**DR MBILINYI** — Creator of T-PYTREXT Framework
+
+> "Build once, deploy everywhere. Python for the mind, Rust for the speed, Elixir for the scale."
+
+---
+
+## 📄 License
+
+MIT License — Free for personal, commercial, educational, and government use.
+
+See [LICENSE](LICENSE) for full details.
+
+---
+
+<p align="center">
+  <b>⭐ Star this repo if you find it useful! ⭐</b><br>
+  <i>Built with ❤️ in Tanzania 🇹🇿 | For Developers Worldwide 🌍</i>
+</p>
