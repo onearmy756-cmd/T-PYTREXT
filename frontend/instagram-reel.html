@@ -3,259 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1080,height=1920">
-<title>🌍 WORLD GAME CHANGER — T-PYTREXT</title>
+<title>T-PYTREXT — World Game Changer</title>
 <style>
-:root {
-  --gold: #f0c040; --gold2: #f7d774; --bg: #0a0a0f;
-  --neon: #00d4ff; --purple: #a855f7; --green: #22d3a0;
-}
+:root{--gold:#f0c040;--gold2:#f7d774;--bg:#0a0a0f;--card-bg:#111827;--text:#e2e8f0;--muted:#94a3b8}
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   width:1080px;height:1920px;overflow:hidden;
-  background:var(--bg);
+  background:var(--bg);color:var(--text);
   font-family:'Segoe UI',system-ui,sans-serif;
   display:flex;align-items:center;justify-content:center;
-  perspective:1200px;
 }
-.scene{position:relative;width:100%;height:100%}
+.scene{position:relative;width:100%;height:100%;overflow:hidden}
 
-/* Particle background */
-.particles{position:absolute;inset:0;overflow:hidden}
-.p{position:absolute;border-radius:50%;animation:float linear infinite;opacity:0}
-@keyframes float{
-  0%{transform:translateY(1920px) scale(0);opacity:0}
-  10%{opacity:1}
+/* Background Particles */
+.particles{position:absolute;inset:0;pointer-events:none;z-index:0}
+.p{
+  position:absolute;border-radius:50%;
+  animation:particleFloat linear infinite;
+  opacity:0;
+}
+@keyframes particleFloat{
+  0%{transform:translateY(2000px) scale(0);opacity:0}
+  5%{opacity:1}
   90%{opacity:1}
-  100%{transform:translateY(-100px) scale(1.5);opacity:0}
+  100%{transform:translateY(-100px) scale(1.8);opacity:0}
 }
 
-/* Central 3D Card */
-.card-wrap{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:800px;height:500px;perspective:1500px;
-  animation:cardFloat 4s ease-in-out infinite;
-}
-@keyframes cardFloat{
-  0%,100%{transform:translate(-50%,-50%) translateY(0)}
-  50%{transform:translate(-50%,-50%) translateY(-15px)}
-}
-.card3d{
-  width:100%;height:100%;position:relative;
-  transform-style:preserve-3d;
-  animation:spin3d 12s linear infinite;
-}
-@keyframes spin3d{
-  0%{transform:rotateY(0deg) rotateX(5deg)}
-  100%{transform:rotateY(360deg) rotateX(5deg)}
-}
-.face{
-  position:absolute;width:100%;height:100%;border-radius:30px;
-  backface-visibility:hidden;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;
-  border:2px solid rgba(240,192,64,0.2);
-  box-shadow:0 30px 80px rgba(0,0,0,0.7),0 0 100px rgba(240,192,64,0.05);
-  overflow:hidden;
-}
-.front{background:linear-gradient(145deg,#111827,#1a1a2e,#0f0f23)}
-.front::before{
-  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-  background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,0.04) 0%,transparent 60%);
-}
-.back{
-  background:linear-gradient(145deg,#111827,#1a1a2e);
-  transform:rotateY(180deg);
-}
-.back::before{
-  content:'';position:absolute;inset:15px;border-radius:20px;
-  border:1px dashed rgba(240,192,64,0.15);
-}
+/* Ring Decorations */
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(240,192,64,0.06);pointer-events:none}
+.ring1{width:1200px;height:1200px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 25s linear infinite}
+.ring2{width:900px;height:900px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 18s linear infinite reverse}
+.ring3{width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 12s linear infinite}
+@keyframes spin{0%{transform:translate(-50%,-50%) rotate(0)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
 
-.logo-icon{
-  font-size:80px;margin-bottom:20px;z-index:2;
-  filter:drop-shadow(0 0 30px rgba(240,192,64,0.4));
-  animation:pulse 2s ease-in-out infinite;
+/* Slides Container */
+.slides{position:relative;z-index:2;width:100%;height:100%}
+.slide{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:80px 60px;opacity:0;transition:opacity 0.8s ease;
 }
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.slide.active{opacity:1}
 
-.brand{
-  font-size:90px;font-weight:900;letter-spacing:8px;z-index:2;
+/* SLIDE 1 - INTRO */
+.s1 .flag{font-size:100px;margin-bottom:30px;animation:bounce 0.6s ease infinite}
+.s1 .from{font-size:36px;color:rgba(255,255,255,0.5);letter-spacing:12px;text-transform:uppercase;margin-bottom:20px}
+.s1 .name{
+  font-size:140px;font-weight:900;letter-spacing:8px;line-height:1;
+  background:linear-gradient(180deg,#fff 0%,#f7d774 40%,#f0c040 60%,#c8960c 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:glow 1.5s ease-in-out infinite;
+}
+.s1 .sub{font-size:28px;color:rgba(255,255,255,0.4);letter-spacing:10px;margin-top:20px;text-transform:uppercase}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 20px rgba(240,192,64,0.3))}50%{filter:drop-shadow(0 0 50px rgba(240,192,64,0.7))}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* SLIDE 2 - FRAMEWORK */
+.s2 .label{font-size:24px;color:rgba(255,255,255,0.4);letter-spacing:15px;margin-bottom:15px;text-transform:uppercase}
+.s2 .fw{
+  font-size:155px;font-weight:900;letter-spacing:15px;line-height:0.9;
   background:linear-gradient(135deg,#f7d774 0%,#f0c040 30%,#c8960c 50%,#f0c040 70%,#f7d774 100%);
-  background-size:200% auto;-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmer 3s linear infinite;
-}
-@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
-
-.sub{font-size:18px;color:rgba(255,255,255,0.5);letter-spacing:10px;z-index:2;text-transform:uppercase;margin-top:8px}
-
-.tech-row{display:flex;gap:16px;margin-top:20px;z-index:2}
-.tech{font-size:14px;letter-spacing:2px;padding:8px 20px;border-radius:25px;
-  font-weight:700;text-transform:uppercase;border:1px solid rgba(255,255,255,0.08);
-  background:rgba(255,255,255,0.02)}
-.t1{color:#ffd43b;border-color:rgba(255,212,59,0.3)}.t2{color:#f74c00;border-color:rgba(247,76,0,0.3)}
-.t3{color:#a855f7;border-color:rgba(168,85,247,0.3)}.t4{color:#22d3a0;border-color:rgba(34,211,160,0.3)}
-
-/* TOP TEXT */
-.top-text{
-  position:absolute;top:120px;left:50%;transform:translateX(-50%);z-index:10;
-  text-align:center;width:100%;
-}
-.top-text .line1{
-  font-size:28px;color:rgba(255,255,255,0.4);letter-spacing:15px;
-  text-transform:uppercase;animation:fadeInDown 1s ease;
-}
-.top-text .line2{
-  font-size:120px;font-weight:900;letter-spacing:12px;line-height:1;
-  background:linear-gradient(180deg,#fff 0%,#f0c040 50%,#c8960c 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  animation:titleGlow 2s ease-in-out infinite;
-  margin-top:10px;
-}
-@keyframes titleGlow{
-  0%,100%{filter:drop-shadow(0 0 20px rgba(240,192,64,0.3))}
-  50%{filter:drop-shadow(0 0 40px rgba(240,192,64,0.6))}
-}
-@keyframes fadeInDown{
-  0%{opacity:0;transform:translateY(-30px)}100%{opacity:1;transform:translateY(0)}
-}
-
-/* BOTTOM TEXT */
-.bottom-text{
-  position:absolute;bottom:180px;left:50%;transform:translateX(-50%);z-index:10;
-  text-align:center;width:90%;
-}
-.bottom-text .main{
-  font-size:70px;font-weight:900;letter-spacing:8px;line-height:1.1;
-  background:linear-gradient(135deg,#ffd700,#ff8c00,#ffd700);
-  background-size:200% auto;-webkit-background-clip:text;
+  background-size:300% auto;-webkit-background-clip:text;
   -webkit-text-fill-color:transparent;background-clip:text;
   animation:shimmer 2s linear infinite;
 }
-.bottom-text .sub2{
-  font-size:22px;color:rgba(255,255,255,0.35);letter-spacing:20px;
-  margin-top:15px;text-transform:uppercase;
-}
+.s2 .stack{display:flex;gap:30px;margin-top:40px;flex-wrap:wrap;justify-content:center}
+.s2 .st{font-size:24px;font-weight:800;letter-spacing:4px;padding:18px 35px;border-radius:35px;border:2px solid;text-transform:uppercase;transition:all 0.3s}
+.s2 .stp{color:#ffd43b;border-color:rgba(255,212,59,0.3);background:rgba(255,212,59,0.05)}.s2 .str{color:#f74c00;border-color:rgba(247,76,0,0.3);background:rgba(247,76,0,0.05)}
+.s2 .ste{color:#a855f7;border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.05)}.s2 .sta{color:#22d3a0;border-color:rgba(34,211,160,0.3);background:rgba(34,211,160,0.05)}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:300% center}}
 
-/* STATS */
-.stats{
-  position:absolute;bottom:350px;left:50%;transform:translateX(-50%);
-  display:flex;gap:40px;z-index:10;
+/* SLIDE 3 - STATS */
+.s3 .head{font-size:28px;color:rgba(255,255,255,0.4);letter-spacing:12px;margin-bottom:40px;text-transform:uppercase}
+.s3 .grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:80%}
+.s3 .b{
+  padding:40px 30px;border-radius:25px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.02);text-align:center
 }
-.stat-box{
-  text-align:center;padding:15px 25px;
-  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
-  border-radius:20px;
+.s3 .b .v{font-size:70px;font-weight:900;color:var(--gold);line-height:1}
+.s3 .b .l{font-size:16px;color:rgba(255,255,255,0.3);letter-spacing:4px;text-transform:uppercase;margin-top:10px}
+
+/* SLIDE 4 - DEMOS */
+.s4 .head{font-size:30px;color:var(--gold);letter-spacing:10px;margin-bottom:30px;text-transform:uppercase}
+.s4 .demolist{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:85%}
+.s4 .d{
+  padding:25px 20px;border-radius:18px;border:1px solid rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.02);text-align:left;font-size:22px;
+  transition:all 0.3s;
 }
-.stat-box .val{font-size:40px;font-weight:900;color:var(--gold)}
-.stat-box .lbl{font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-transform:uppercase;margin-top:5px}
+.s4 .d:hover{border-color:rgba(240,192,64,0.3);transform:scale(1.03)}
 
-/* CREDIT */
-.credit{
-  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:10;
-  font-size:20px;color:rgba(255,255,255,0.25);letter-spacing:6px;text-transform:uppercase;
+/* SLIDE 5 - CLOSING */
+.s5 .wc{
+  font-size:110px;font-weight:900;letter-spacing:8px;line-height:1.1;
+  background:linear-gradient(135deg,#ffd700 0%,#ff8c00 50%,#ffd700 100%);
+  background-size:200% auto;-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 1.5s linear infinite;
 }
-
-/* REFLECTION */
-.reflect{
-  position:absolute;bottom:200px;left:50%;transform:translateX(-50%);
-  width:600px;height:80px;opacity:0.15;
-  background:linear-gradient(to bottom,rgba(240,192,64,0.2),transparent);
-  border-radius:50%;filter:blur(20px);
-  animation:reflectPulse 3s ease-in-out infinite;
+.s5 .by{font-size:28px;color:rgba(255,255,255,0.4);letter-spacing:8px;margin-top:30px;text-transform:uppercase}
+.s5 .creator{
+  font-size:60px;font-weight:800;letter-spacing:6px;margin-top:25px;
+  color:var(--gold);animation:glow 1.5s ease-in-out infinite;
 }
-@keyframes reflectPulse{0%,100%{opacity:0.1;transform:translateX(-50%) scaleX(0.9)}50%{opacity:0.25;transform:translateX(-50%) scaleX(1.1)}}
+.s5 .loc{font-size:24px;color:rgba(255,255,255,0.3);letter-spacing:10px;margin-top:40px;text-transform:uppercase}
+.s5 .url{font-size:22px;color:rgba(255,255,255,0.2);letter-spacing:3px;margin-top:60px;text-transform:uppercase}
 
-/* RINGS */
-.ring{position:absolute;border-radius:50%;border:1px solid rgba(240,192,64,0.08);pointer-events:none}
-.ring1{width:900px;height:900px;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringSpin 20s linear infinite}
-.ring2{width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringSpin 15s linear infinite reverse}
-.ring3{width:500px;height:500px;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringSpin 10s linear infinite}
-@keyframes ringSpin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
+/* Progress Bar */
+.progress{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:20;width:90%;height:4px;background:rgba(255,255,255,0.05);border-radius:2px}
+.progress .bar{height:100%;background:var(--gold);border-radius:2px;transition:width 0.5s ease}
 
-/* FLAG */
-.flag{position:absolute;top:80px;right:80px;font-size:60px;z-index:10;animation:bounce 1s ease infinite}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+/* 3D Card Animation */
+.card3d-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;pointer-events:none}
+.card3d{
+  width:400px;height:260px;transform-style:preserve-3d;
+  animation:rotate3d 10s linear infinite;
+  opacity:0.3;
+}
+@keyframes rotate3d{0%{transform:rotateY(0) rotateX(10deg)}100%{transform:rotateY(360deg) rotateX(10deg)}}
+.cface{position:absolute;width:100%;height:100%;border-radius:20px;backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:900;
+  border:1px solid rgba(240,192,64,0.1);background:rgba(17,24,39,0.8)}
+.cback{transform:rotateY(180deg)}
 </style>
 </head>
 <body>
 <div class="scene">
-  <!-- Rings -->
   <div class="ring ring1"></div>
   <div class="ring ring2"></div>
   <div class="ring ring3"></div>
-
-  <!-- Particles -->
   <div class="particles" id="particles"></div>
 
-  <!-- Flag -->
-  <div class="flag">🇹🇿</div>
-
-  <!-- Top Text -->
-  <div class="top-text">
-    <div class="line1">Introducing</div>
-    <div class="line2">PYTREX</div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat-box"><div class="val">34K+</div><div class="lbl">Lines</div></div>
-    <div class="stat-box"><div class="val">220+</div><div class="lbl">Classes</div></div>
-    <div class="stat-box"><div class="val">10</div><div class="lbl">Demos</div></div>
-    <div class="stat-box"><div class="val">96</div><div class="lbl">Tests</div></div>
-  </div>
-
-  <!-- Card -->
-  <div class="card-wrap">
+  <!-- 3D Card Background -->
+  <div class="card3d-wrap">
     <div class="card3d">
-      <div class="face front">
-        <div class="logo-icon">⚡</div>
-        <div class="brand">T-PYTREXT</div>
-        <div class="sub">Python · Rust · Elixir · AI</div>
-        <div class="tech-row">
-          <span class="tech t1">Python</span>
-          <span class="tech t2">Rust</span>
-          <span class="tech t3">Elixir</span>
-          <span class="tech t4">AI/ML</span>
-        </div>
-      </div>
-      <div class="face back">
-        <div class="logo-icon" style="font-size:50px">🌍</div>
-        <div style="color:var(--gold);font-size:36px;font-weight:800;letter-spacing:6px">WORLD FIRST</div>
-        <div style="color:rgba(255,255,255,0.3);font-size:16px;letter-spacing:4px;margin-top:15px;text-align:center;line-height:2">
-          Python + Tauri + Elixir<br>
-          Blockchain + AI + MCP<br>
-          ALL IN ONE FRAMEWORK
-        </div>
-      </div>
+      <div class="cface" style="color:var(--gold)">T-PYTREXT</div>
+      <div class="cface cback" style="color:var(--gold)">⚡</div>
     </div>
   </div>
-  <div class="reflect"></div>
 
-  <!-- Bottom Text -->
-  <div class="bottom-text">
-    <div class="main">WORLD GAME CHANGER</div>
-    <div class="sub2">Built in Tanzania · For the World</div>
+  <!-- Slides -->
+  <div class="slides">
+    <!-- SLIDE 1: Intro -->
+    <div class="slide s1 active" data-slide="0">
+      <div class="flag">🇹🇿</div>
+      <div class="from">From Tanzania</div>
+      <div class="name">DR JACKSON<br>MBILINYI</div>
+      <div class="sub">Presents</div>
+    </div>
+
+    <!-- SLIDE 2: Framework Name -->
+    <div class="slide s2" data-slide="1">
+      <div class="label">Introducing</div>
+      <div class="fw">T-PYTREXT</div>
+      <div class="stack">
+        <span class="st stp">Python</span>
+        <span class="st str">Rust</span>
+        <span class="st ste">Elixir</span>
+        <span class="st sta">AI/ML</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Stats -->
+    <div class="slide s3" data-slide="2">
+      <div class="head">Built With Power</div>
+      <div class="grid">
+        <div class="b"><div class="v">34K+</div><div class="l">Lines of Code</div></div>
+        <div class="b"><div class="v">220+</div><div class="l">Classes</div></div>
+        <div class="b"><div class="v">10</div><div class="l">Live Demos</div></div>
+        <div class="b"><div class="v">96</div><div class="l">Tests (100%)</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: What It Does -->
+    <div class="slide s4" data-slide="3">
+      <div class="head">⚡ What It Does</div>
+      <div class="demolist">
+        <div class="d">🏦 Banking & FinTech</div>
+        <div class="d">🏥 Hospital Systems</div>
+        <div class="d">🗳️ Blockchain Voting</div>
+        <div class="d">🤖 AI Trading Bots</div>
+        <div class="d">💬 Real-Time Chat</div>
+        <div class="d">🏠 Property Platforms</div>
+        <div class="d">📚 AI Exam Systems</div>
+        <div class="d">🛡️ CyberSecurity</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: World Game Changer -->
+    <div class="slide s5" data-slide="4">
+      <div class="wc">WORLD<br>GAME<br>CHANGER</div>
+      <div class="by">Created by</div>
+      <div class="creator">DR JACKSON MBILINYI</div>
+      <div class="loc">🇹🇿 Tanzania · Africa</div>
+      <div class="url">github.com/onearmy756-cmd/T-PYTREXT</div>
+    </div>
   </div>
 
-  <!-- Credit -->
-  <div class="credit">DR MBILINYI · 2026</div>
+  <!-- Progress Bar -->
+  <div class="progress"><div class="bar" id="progressBar"></div></div>
 </div>
 
 <script>
 // Particles
-const container = document.getElementById('particles');
+const pc = document.getElementById('particles');
 const colors = ['#f0c040','#00d4ff','#a855f7','#22d3a0','#f472b6','#ff8c00'];
-for(let i=0;i<80;i++){
-  const p=document.createElement('div');
-  p.className='p';
+for(let i=0;i<100;i++){
+  const p=document.createElement('div');p.className='p';
   p.style.left=Math.random()*100+'%';
   p.style.width=p.style.height=(Math.random()*3+2)+'px';
   p.style.background=colors[Math.floor(Math.random()*colors.length)];
-  p.style.animationDuration=(Math.random()*8+6)+'s';
-  p.style.animationDelay=(Math.random()*8)+'s';
-  container.appendChild(p);
+  p.style.animationDuration=(Math.random()*7+8)+'s';
+  p.style.animationDelay=(Math.random()*7)+'s';
+  pc.appendChild(p);
 }
+
+// Slideshow
+const slides = document.querySelectorAll('.slide');
+const bar = document.getElementById('progressBar');
+const totalSlides = slides.length;
+const slideDuration = 3500; // 3.5s per slide
+let currentSlide = 0;
+
+function showSlide(index){
+  slides.forEach(s=>s.classList.remove('active'));
+  slides[index].classList.add('active');
+  bar.style.width = ((index+1)/totalSlides*100)+'%';
+}
+
+function nextSlide(){
+  currentSlide = (currentSlide+1)%totalSlides;
+  showSlide(currentSlide);
+}
+
+setInterval(nextSlide, slideDuration);
+showSlide(0);
 </script>
 </body>
 </html>
