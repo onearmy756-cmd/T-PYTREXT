@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<title>T-PYTREX Framework — Brochure</title>
+<style>
+  :root {--gold:#f0c040;--gold2:#f7d774;--dark:#0a0a0f;--card:#111827;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b;--blue:#38bdf8;--green:#22d3a0}
+  @page{size:A4;margin:0}*{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:var(--text)}
+  .page{width:210mm;min-height:297mm;margin:0 auto;background:var(--dark);position:relative;overflow:hidden;padding:12mm 15mm}
+  .cover{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:277mm;background:linear-gradient(160deg,#0a0a0f 0%,#111827 40%,#1a1a2e 70%,#0f0f23 100%)}
+  .cover h1{font-size:52pt;font-weight:900;letter-spacing:6pt;background:linear-gradient(135deg,#f7d774,#f0c040,#c8960c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8mm}
+  .cover .sub{font-size:14pt;color:var(--muted);letter-spacing:4pt;text-transform:uppercase;margin-bottom:10mm}
+  .cover .stats{display:flex;gap:6mm;flex-wrap:wrap;justify-content:center;margin-top:8mm}
+  .cover .stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:5mm 8mm;text-align:center}
+  .cover .stat .v{font-size:22pt;font-weight:900;color:var(--gold)}
+  .cover .stat .l{font-size:8pt;color:var(--muted);letter-spacing:2pt;text-transform:uppercase}
+  h2{font-size:20pt;color:var(--gold);border-bottom:2px solid rgba(240,192,64,0.2);padding-bottom:3mm;margin-bottom:8mm;margin-top:12mm}
+  table{width:100%;border-collapse:collapse;margin:6mm 0;font-size:9pt}
+  th{background:rgba(240,192,64,0.1);color:var(--gold);padding:3mm 4mm;text-align:left;font-weight:700;letter-spacing:1pt}
+  td{padding:2.5mm 4mm;border-bottom:1px solid var(--border)}
+  tr:nth-child(even){background:rgba(255,255,255,0.02)}
+  .badge{display:inline-block;padding:1mm 3mm;border-radius:8px;font-size:7pt;font-weight:700;letter-spacing:0.5pt;margin:1mm}
+  .b-py{background:rgba(255,212,59,0.15);color:#ffd43b}.b-rs{background:rgba(247,76,0,0.15);color:#f74c00}
+  .b-ex{background:rgba(168,85,247,0.15);color:#a855f7}.b-ai{background:rgba(34,211,160,0.15);color:#22d3a0}
+  .b-mcp{background:rgba(56,189,248,0.15);color:#38bdf8}.b-bc{background:rgba(240,192,64,0.15);color:#f0c040}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin:5mm 0}
+  .card{border:1px solid var(--border);border-radius:10px;padding:5mm;background:rgba(255,255,255,0.02)}
+  .card h3{font-size:12pt;margin-bottom:3mm;color:var(--text)}
+  .card p{font-size:8pt;color:var(--muted);line-height:1.5}
+  .big-num{font-size:28pt;font-weight:900;color:var(--gold);line-height:1}
+  .page-num{position:absolute;bottom:8mm;right:15mm;font-size:7pt;color:var(--muted);letter-spacing:2pt}
+  .footer{text-align:center;color:var(--muted);font-size:7pt;margin-top:10mm;padding-top:5mm;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="cover">
+    <div class="sub">Full-Stack AI & Real-Time Desktop Framework</div>
+    <h1>T-PYTREXT</h1>
+    <div class="sub" style="margin-top:-2mm">Python + Rust + Elixir + Tauri v2</div>
+    <div class="stats">
+      <div class="stat"><div class="v">34K+</div><div class="l">Lines of Code</div></div>
+      <div class="stat"><div class="v">220+</div><div class="l">Classes</div></div>
+      <div class="stat"><div class="v">9</div><div class="l">Demos</div></div>
+      <div class="stat"><div class="v">96</div><div class="l">Tests (100%)</div></div>
+      <div class="stat"><div class="v">15</div><div class="l">CLI Commands</div></div>
+    </div>
+    <p style="margin-top:10mm;color:var(--muted);font-size:9pt">Built by DR MBILINYI &bull; Tanzania 🇹🇿 &bull; For the World 🌍</p>
+  </div>
+  <div class="page-num">1 / 5</div>
+</div>
+
+<div class="page">
+  <h2>🏗️ Architecture — 4 Powerful Layers</h2>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+    <tr><td><b>1. Desktop UI</b></td><td><span class="badge b-rs">Tauri v2</span></td><td>Lightweight webview — 10x lighter than Electron, Rust security</td></tr>
+    <tr><td><b>2. Rust Core</b></td><td><span class="badge b-rs">PyO3 + Axum</span></td><td>Blockchain, AES-256, SQLx DB, Candle ML, Burn DL, MCP Server</td></tr>
+    <tr><td><b>3. Python Core</b></td><td><span class="badge b-py">Python 3.12</span></td><td>220+ classes — LangChain, Hermes, RAG, HITL, Search, Events</td></tr>
+    <tr><td><b>4. Real-Time</b></td><td><span class="badge b-ex">Elixir BEAM</span></td><td>WebSocket, ClusterManager, TaskDispatcher — millions of connections</td></tr>
+  </table>
+
+  <h2>⚡ Performance Benchmarks</h2>
+  <div class="grid2">
+    <div class="card"><p class="big-num">116,478/s</p><p>Events per second</p></div>
+    <div class="card"><p class="big-num">44ms</p><p>App startup time</p></div>
+    <div class="card"><p class="big-num">1,898/s</p><p>Blockchain blocks/sec</p></div>
+    <div class="card"><p class="big-num">10,892/s</p><p>AES-256 encryptions/sec</p></div>
+    <div class="card"><p class="big-num">359,274/s</p><p>SHA-256 hashes/sec</p></div>
+    <div class="card"><p class="big-num">7,543/s</p><p>Async events (8 threads)</p></div>
+  </div>
+  <div class="page-num">2 / 5</div>
+</div>
+
+<div class="page">
+  <h2>🔑 Key Features</h2>
+  <div class="grid2">
+    <div class="card"><h3>🔗 Blockchain</h3><p>SHA-256 immutable ledger. Create, verify, audit blocks. Tamper detection built-in. Perfect for finance, voting, supply chain.</p></div>
+    <div class="card"><h3>🔐 AES-256 Encryption</h3><p>Military-grade encryption. Encrypted SQLite database. Memory zeroization. Secure key management.</p></div>
+    <div class="card"><h3>🧠 AI/ML Engine</h3><p>LangChain + Hermes Agent + PyTorch + Candle + Burn + RAG. Build intelligent apps with one line.</p></div>
+    <div class="card"><h3>🌐 Real-Time</h3><p>Elixir BEAM VM handles millions of concurrent connections. Perfect for chat, trading, live dashboards.</p></div>
+    <div class="card"><h3>🤖 MCP Protocol</h3><p>Model Context Protocol — Server + Client. Expose tools to AI models. Connect to external MCP servers.</p></div>
+    <div class="card"><h3>👤 Human-in-the-Loop</h3><p>Approval workflows for AI actions. Timeout management. Audit trail. Tauri notifications.</p></div>
+    <div class="card"><h3>🔍 Web Search</h3><p>SearXNG + DuckDuckGo integration. Multi-engine search with automatic fallback. RAG-ready.</p></div>
+    <div class="card"><h3>🖥️ Desktop UI</h3><p>Tauri v2 lightweight webview. No Chromium bloat. Cross-platform: Windows, macOS, Linux.</p></div>
+  </div>
+  <div class="page-num">3 / 5</div>
+</div>
+
+<div class="page">
+  <h2>🎮 9 Live Demo Projects</h2>
+  <table>
+    <tr><th>#</th><th>Demo</th><th>Category</th><th>Key Features</th></tr>
+    <tr><td>1</td><td>🏦 Smart Bank POS</td><td>FinTech</td><td>Blockchain, AES-256, AI Signatures, SQLx</td></tr>
+    <tr><td>2</td><td>🛒 Smart Retail POS</td><td>E-Commerce</td><td>YOLO AI, Real-time Inventory, Elixir</td></tr>
+    <tr><td>3</td><td>💬 Chat System</td><td>Social</td><td>WebSocket, E2E Encryption, Groups</td></tr>
+    <tr><td>4</td><td>🤖 Crypto Trading Bot</td><td>Trading</td><td>AI Market Analysis, Blockchain, HITL</td></tr>
+    <tr><td>5</td><td>🏥 Hospital Management</td><td>Health</td><td>Encrypted EHR, AI Diagnosis, Prescriptions</td></tr>
+    <tr><td>6</td><td>📚 AI Exam System</td><td>Education</td><td>RAG, Hermes AI, Auto-Grading</td></tr>
+    <tr><td>7</td><td>🏠 Real Estate Platform</td><td>Property</td><td>AI Valuation, Contracts, M-Pesa</td></tr>
+    <tr><td>8</td><td>🗳️ Blockchain Voting</td><td>Government</td><td>Immutable Votes, Anti-Fraud, HITL</td></tr>
+    <tr><td>9</td><td>🛡️ CyberSec Toolkit</td><td>Security</td><td>Port Scanner, OSINT, Forensics, AI Audit</td></tr>
+  </table>
+
+  <h2>🚀 Deployment — Any Server</h2>
+  <div class="grid2">
+    <div class="card"><h3>🐳 Docker</h3><p>One command: docker-compose up -d</p></div>
+    <div class="card"><h3>☸️ Kubernetes</h3><p>kubectl apply -f k8s-*.yaml</p></div>
+    <div class="card"><h3>☁️ AWS Lambda</h3><p>Serverless — pay per request</p></div>
+    <div class="card"><h3>☁️ GCP Cloud Run</h3><p>2M requests/month FREE</p></div>
+    <div class="card"><h3>🐧 Linux VPS</h3><p>bash deploy-server.sh</p></div>
+    <div class="card"><h3>🪟 Windows Server</h3><p>PowerShell install-service.ps1</p></div>
+  </div>
+  <div class="page-num">4 / 5</div>
+</div>
+
+<div class="page">
+  <h2>🔧 15 CLI Commands</h2>
+  <table>
+    <tr><th>Command</th><th>Description</th></tr>
+    <tr><td><code>pytrex init &lt;name&gt;</code></td><td>Create new project</td></tr>
+    <tr><td><code>pytrex dev</code></td><td>Dev mode with hot-reload</td></tr>
+    <tr><td><code>pytrex scan</code></td><td>Discover all PyTreXT projects</td></tr>
+    <tr><td><code>pytrex run &lt;name&gt;</code></td><td>Run any project</td></tr>
+    <tr><td><code>pytrex test</code></td><td>Test all modules (96 tests)</td></tr>
+    <tr><td><code>pytrex deploy</code></td><td>Deploy to production</td></tr>
+    <tr><td><code>pytrex dashboard</code></td><td>Open project dashboard</td></tr>
+    <tr><td><code>pytrex build</code></td><td>Build for production</td></tr>
+  </table>
+
+  <h2>💰 License & Pricing</h2>
+  <table>
+    <tr><th>Tier</th><th>Price</th><th>Who</th></tr>
+    <tr><td>🆓 Community</td><td><b>FREE</b></td><td>Students, Startups &lt;$1M, Non-profits, Personal</td></tr>
+    <tr><td>🚀 Startup</td><td><b>$499/yr</b></td><td>Small companies, SaaS, Agencies (≤10 devs)</td></tr>
+    <tr><td>💼 Professional</td><td><b>$2,999/yr</b></td><td>Banks, Government, Healthcare, Mid-size (≤50 devs)</td></tr>
+    <tr><td>🏢 Enterprise</td><td><b>Custom</b></td><td>Large corporations, Military, Telecom, Global</td></tr>
+    <tr><td>🇹🇿 Tanzania</td><td><b>TZS 250K-1.5M</b></td><td>Special local pricing for Tanzanian companies</td></tr>
+  </table>
+
+  <h2>📊 Framework at a Glance</h2>
+  <div class="grid2">
+    <div class="card"><p class="big-num">3</p><p>Languages (Python+Rust+Elixir)</p></div>
+    <div class="card"><p class="big-num">15</p><p>Deploy Configs (Docker,k8s,Cloud)</p></div>
+    <div class="card"><p class="big-num">8</p><p>Documentation Files</p></div>
+    <div class="card"><p class="big-num">AGPL</p><p>+ Commercial Dual License</p></div>
+  </div>
+
+  <div class="footer">
+    <b>T-PYTREXT Framework v1.0</b> &bull; Built by DR MBILINYI 🇹🇿 &bull; github.com/onearmy756-cmd/T-PYTREXT &bull; Licensed AGPL-3.0 + Commercial
+  </div>
+  <div class="page-num">5 / 5</div>
+</div>
+</body>
+</html>
