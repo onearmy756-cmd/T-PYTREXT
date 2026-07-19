@@ -1,0 +1,112 @@
+# ═══════════════════════════════════════════════════════════════
+#  T-PYTREXT SERVERLESS — AWS Lambda + API Gateway + DynamoDB
+#  Deploy: aws cloudformation deploy --template-file serverless-aws.yml --stack-name pytrex
+# ═══════════════════════════════════════════════════════════════
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'T-PYTREXT Serverless — Lambda + API Gateway'
+
+Parameters:
+  AppName:
+    Type: String
+    Default: t-pytrext
+  Environment:
+    Type: String
+    Default: production
+
+Resources:
+  PyTreXTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AppName}-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+  PyTreXFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-${Environment}
+      Runtime: python3.12
+      Handler: main.handler
+      Role: !GetAtt LambdaRole.Arn
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          PYTREX_ENV: !Ref Environment
+          PYTREX_DB_TABLE: !Ref PyTreXTable
+      Code:
+        ZipFile: |
+          import json
+          from pytrex.core import execute_python_event
+          def handler(event, context):
+              body = json.loads(event.get('body', '{}'))
+              name = body.get('event', 'ping')
+              data = body.get('data', '{}')
+              result = execute_python_event(name, data)
+              return {'statusCode': 200, 'headers': {'Content-Type': 'application/json'}, 'body': result}
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:Query, dynamodb:Scan]
+                Resource: !GetAtt PyTreXTable.Arn
+
+  PyTreXAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AppName}-api
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PyTreXAPI
+      ParentId: !GetAtt PyTreXAPI.RootResourceId
+      PathPart: '{proxy+}'
+
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PyTreXAPI
+      ResourceId: !Ref ApiResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PyTreXFunction.Arn}/invocations
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PyTreXFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub https://${PyTreXAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/

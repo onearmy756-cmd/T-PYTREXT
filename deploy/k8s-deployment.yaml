@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: testapp
+  name: test
   labels:
-    app: testapp
+    app: test
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: testapp
+      app: test
   template:
     metadata:
       labels:
-        app: testapp
+        app: test
     spec:
       containers:
-        - name: testapp
-          image: testapp:1.0.0
+        - name: test
+          image: test:1.0.0
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 9000
               name: http
             - containerPort: 9090
               name: metrics
@@ -27,13 +27,13 @@ spec:
             - name: PYTREX_ENV
               value: "production"
             - name: PYTREX_PORT
-              value: "8080"
+              value: "9000"
             - name: PYTREX_LOG_LEVEL
               value: "INFO"
             - name: PYTREX_AUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: testapp-secrets
+                  name: test-secrets
                   key: auth-secret
           resources:
             requests:
@@ -45,13 +45,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 8080
+              port: 9000
             initialDelaySeconds: 10
             periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /health
-              port: 8080
+              port: 9000
             initialDelaySeconds: 5
             periodSeconds: 10
       restartPolicy: Always

@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir target/wheels/*.whl 2>/dev/null || true
 # ─── Stage 2: Production Runtime ───
 FROM python:3.12-slim
 
-LABEL app="testapp" \
+LABEL app="test" \
       version="1.0.0" \
       framework="PyTreXT" \
       maintainer="PyTreXT Builder"
@@ -60,16 +60,16 @@ USER pytrex
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD python -c "import json,urllib.request; json.load(urllib.request.urlopen('http://localhost:8080/health'))" || exit 1
+    CMD python -c "import json,urllib.request; json.load(urllib.request.urlopen('http://localhost:9000/health'))" || exit 1
 
 # Environment
 ENV PYTREX_ENV=production \
-    PYTREX_PORT=8080 \
+    PYTREX_PORT=9000 \
     PYTREX_LOG_LEVEL=INFO \
     PYTREX_DB_PATH=/data/pytrex.db
 
 # Expose port
-EXPOSE 8080 9090
+EXPOSE 9000 9090
 
 # Security hardening
 RUN chmod 755 /app && chmod 644 /app/*.py 2>/dev/null || true
