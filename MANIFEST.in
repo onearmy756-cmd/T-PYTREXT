@@ -1,0 +1,29 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include requirements.txt
+include requirements-dev.txt
+include src/lib.rs
+include Cargo.toml
+include build.rs
+include tauri.conf.json
+include Dockerfile
+include install.sh
+include install.ps1
+
+recursive-include pytrex *.py
+recursive-include pytrex/templates *
+recursive-include pytrex_engine *.ex *.exs
+recursive-include frontend *.html *.css *.js
+recursive-include demos *.py *.json *.html *.txt
+recursive-include deploy *.yml *.yaml *.md *.json *.conf *.service *.ps1
+recursive-include tests *.py
+recursive-include docs *.md
+recursive-include icons *.ico *.png *.svg
+recursive-include .github *
+
+exclude __pycache__
+exclude *.pyc
+exclude .git
+exclude *.db
+exclude *.log
