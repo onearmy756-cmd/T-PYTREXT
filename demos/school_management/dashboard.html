@@ -1,166 +1,258 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏫 Smart Academy — T-PYTREXT</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏫 Smart Academy — Live System</title>
 <style>
-:root{--bg:#0a0f1a;--card:#111827;--gold:#f0c040;--text:#e2e8f0;--muted:#64748b;--border:#1e293b;--green:#22d3a0;--red:#ef4444;--blue:#38bdf8;--purple:#a855f7}
+:root{--bg:#0a0f1a;--card:#111827;--gold:#f0c040;--text:#e2e8f0;--muted:#64748b;--border:#1e293b;--green:#22d3a0;--red:#ef4444;--blue:#38bdf8}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-.header{background:linear-gradient(135deg,#111827,#1a1a2e);border-bottom:1px solid var(--border);padding:16px 30px;display:flex;justify-content:space-between;align-items:center}
-.header h1{background:linear-gradient(135deg,#f7d774,#f0c040,#c8960c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:24px}
-.header .badge{font-size:10px;color:var(--muted);letter-spacing:2px}
-.content{max-width:1300px;margin:0 auto;padding:20px}
-
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:all 0.3s}
-.stat:hover{border-color:rgba(240,192,64,0.3);transform:translateY(-2px)}
-.stat .v{font-size:32px;font-weight:900;color:var(--gold)}
-.stat .l{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
-
-/* Grid */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px}
-.card h2{font-size:16px;color:var(--gold);margin-bottom:15px;letter-spacing:1px;text-transform:uppercase}
-.card h2 span{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}
-
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase}
-td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03)}
-tr:hover{background:rgba(255,255,255,0.02)}
-.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:0.5px}
-.tag-ok{background:rgba(34,211,160,0.15);color:var(--green)}
-.tag-warn{background:rgba(234,179,8,0.15);color:#eab308}
-.tag-A{color:var(--green);font-weight:900}.tag-B{color:var(--blue)}.tag-C{color:var(--gold)}.tag-F{color:var(--red)}
-
-.progress-bar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:6px}
-.progress-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.8s ease}
-
-.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.btn{padding:10px 20px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.03);color:var(--text);cursor:pointer;font-size:13px;transition:all 0.2s;letter-spacing:0.5px}
-.btn:hover,.btn.active{border-color:var(--gold);background:rgba(240,192,64,0.08)}
-.btn.act{border-color:var(--gold);background:rgba(240,192,64,0.12);color:var(--gold)}
-
-.footer{text-align:center;color:var(--muted);font-size:10px;padding:20px;border-top:1px solid var(--border);margin-top:20px}
-.loading{text-align:center;color:var(--muted);padding:40px;animation:pulse 1s ease infinite}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif}
+.header{background:linear-gradient(135deg,#111827,#1a1a2e);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{background:linear-gradient(135deg,#f7d774,#f0c040,#c8960c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:22px}
+.header .live{color:var(--green);font-size:11px;letter-spacing:2px;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.content{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card h2{font-size:15px;color:var(--gold);margin-bottom:12px;letter-spacing:1px;text-transform:uppercase}
+.full{grid-column:1/-1}
+
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.st{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.st .v{font-size:26px;font-weight:900;color:var(--gold)}
+.st .l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 10px;border-bottom:2px solid var(--border);color:var(--gold);font-size:10px;letter-spacing:1px;text-transform:uppercase}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.tag{display:inline-block;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:700}.tg{background:rgba(34,211,160,0.15);color:var(--green)}.tr{background:rgba(239,68,68,0.15);color:var(--red)}
+
+form{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+input,select{flex:1;min-width:100px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.03);color:var(--text);font-size:12px;outline:none}
+input:focus,select:focus{border-color:var(--gold)}
+form button{padding:10px 20px;border:1px solid var(--gold);border-radius:8px;background:rgba(240,192,64,0.1);color:var(--gold);cursor:pointer;font-weight:700;font-size:12px;letter-spacing:1px;white-space:nowrap}
+form button:hover{background:rgba(240,192,64,0.2)}
+form button.danger{border-color:var(--red);color:var(--red);background:rgba(239,68,68,0.05)}
+
+.msg{padding:8px 12px;border-radius:8px;font-size:11px;margin-top:8px;display:none}
+.msg-ok{background:rgba(34,211,160,0.1);color:var(--green);border:1px solid rgba(34,211,160,0.2)}
+.msg-err{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+
+.log{background:#000;color:#0f0;font-family:monospace;font-size:10px;padding:10px;border-radius:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap}
+.progress-bar{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.5s}
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>🏫 Smart Academy</h1>
-  <span class="badge">Built with T-PYTREXT</span>
+  <h1>🏫 Smart Academy — T-PYTREXT</h1>
+  <span class="live">● LIVE</span>
 </div>
 
 <div class="content">
-  <div id="stats" class="stats">
-    <div class="stat"><div class="v" id="stStudents">...</div><div class="l">Students</div></div>
-    <div class="stat"><div class="v" id="stTeachers">...</div><div class="l">Teachers</div></div>
-    <div class="stat"><div class="v" id="stClasses">...</div><div class="l">Classes</div></div>
-    <div class="stat"><div class="v" id="stFees">...</div><div class="l">Fees (TZS)</div></div>
-    <div class="stat"><div class="v" id="stScore">...</div><div class="l">Avg Score</div></div>
-    <div class="stat"><div class="v" id="stBC">...</div><div class="l">Blockchain</div></div>
+  <!-- Stats -->
+  <div class="stats full" id="statsRow"></div>
+
+  <!-- ADD STUDENT -->
+  <div class="card full">
+    <h2>➕ Register New Student</h2>
+    <form id="addStudentForm">
+      <input name="first_name" placeholder="First Name" required>
+      <input name="last_name" placeholder="Last Name" required>
+      <input name="dob" type="date" value="2010-01-01">
+      <select name="gender"><option value="M">Male</option><option value="F">Female</option></select>
+      <select name="class_id">
+        <option value="FORM-1">Form 1</option><option value="FORM-2">Form 2</option>
+        <option value="FORM-3">Form 3</option><option value="FORM-4">Form 4</option>
+      </select>
+      <input name="parent_name" placeholder="Parent Name">
+      <input name="parent_phone" placeholder="Phone (2557...)" value="2557">
+      <input name="address" placeholder="Address" value="Dar es Salaam">
+      <button type="submit">➕ Register Student</button>
+    </form>
+    <div class="msg" id="stuMsg"></div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn act" onclick="loadAll()">🔄 Refresh</button>
-    <button class="btn" onclick="alert('📝 New Student\n\nUse: pytrex API → register_student')">➕ Add Student</button>
-    <button class="btn" onclick="alert('💰 Record Fee\n\nUse: pytrex API → record_fee_payment')">💰 Record Fee</button>
-    <button class="btn" onclick="alert('📜 Issue Certificate\n\nUse: pytrex API → issue_certificate')">📜 Certificate</button>
+  <!-- STUDENTS TABLE -->
+  <div class="card full">
+    <h2>👨‍🎓 All Students <span id="stuCount" style="color:var(--muted);font-weight:400;font-size:11px"></span></h2>
+    <table><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Gender</th><th>Status</th></tr></thead>
+    <tbody id="stuTable"></tbody></table>
   </div>
 
-  <div class="grid2">
-    <div class="card">
-      <h2>👨‍🎓 Students <span id="stuCount"></span></h2>
-      <table><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Status</th></tr></thead>
-      <tbody id="stuTable"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody></table>
-    </div>
-    <div class="card">
-      <h2>👨‍🏫 Teachers <span id="tchCount"></span></h2>
-      <table><thead><tr><th>Name</th><th>Qualification</th><th>Subjects</th></tr></thead>
-      <tbody id="tchTable"><tr><td colspan="3" class="loading">Loading...</td></tr></tbody></table>
-    </div>
-    <div class="card" style="grid-column:1/-1">
-      <h2>📊 Exam Rankings — Form 1</h2>
-      <table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Grade</th><th>Progress</th></tr></thead>
-      <tbody id="rankTable"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody></table>
-    </div>
+  <!-- ADD FEE -->
+  <div class="card">
+    <h2>💰 Record Fee Payment</h2>
+    <form id="feeForm">
+      <select name="student_id" id="feeStudentSelect" style="flex:2"></select>
+      <input name="amount" type="number" placeholder="Amount (TZS)" value="350000" style="flex:1">
+      <select name="term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+      <select name="method"><option>M-Pesa</option><option>Cash</option><option>Bank</option></select>
+      <button type="submit">💰 Pay</button>
+    </form>
+    <div class="msg" id="feeMsg"></div>
+    <div style="margin-top:12px"><b>Total Collected:</b> <span style="color:var(--gold)" id="totalFees">0</span></div>
+  </div>
+
+  <!-- RECORD EXAM -->
+  <div class="card">
+    <h2>📊 Enter Exam Results</h2>
+    <form id="examForm">
+      <select name="student_id" id="examStudentSelect" style="flex:2"></select>
+      <input name="math" type="number" placeholder="Math" value="75" style="flex:1;min-width:60px">
+      <input name="english" type="number" placeholder="English" value="68" style="flex:1;min-width:60px">
+      <input name="kiswahili" type="number" placeholder="Kiswahili" value="82" style="flex:1;min-width:60px">
+      <input name="science" type="number" placeholder="Science" value="70" style="flex:1;min-width:60px">
+      <button type="submit">📊 Submit</button>
+    </form>
+    <div class="msg" id="examMsg"></div>
+  </div>
+
+  <!-- RANKINGS -->
+  <div class="card full">
+    <h2>🏆 Exam Rankings</h2>
+    <table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Grade</th><th>Progress</th></tr></thead>
+    <tbody id="rankTable"></tbody></table>
+  </div>
+
+  <!-- ACTIVITY LOG -->
+  <div class="card full">
+    <h2>📜 Activity Log</h2>
+    <div class="log" id="activityLog">System ready. Waiting for actions...</div>
   </div>
 </div>
 
-<div class="footer">T-PYTREXT School Management System &copy; 2026 — Built by DR JACKSON MBILINYI 🇹🇿</div>
-
 <script>
-const API = 'http://localhost:8080/api/';
+const API = 'http://localhost:8080/api';
+const log = document.getElementById('activityLog');
 
-async function fetchJSON(url){
-  try{ const r=await fetch(url); return await r.json(); }
-  catch(e){ console.error(e); return null; }
+function addLog(msg){ const t = new Date().toLocaleTimeString(); log.innerHTML += `\n[${t}] ${msg}`; log.scrollTop = log.scrollHeight; }
+
+async function apiGet(path){
+  try{ const r = await fetch(API+path); return await r.json(); }
+  catch(e){ addLog(`❌ API Error: ${e}`); return null; }
 }
 
-async function loadAll(){
-  // Dashboard
-  const dash = await fetchJSON(API+'dashboard');
-  if(dash){
-    document.getElementById('stStudents').textContent = dash.students.total;
-    document.getElementById('stTeachers').textContent = dash.teachers.total;
-    document.getElementById('stClasses').textContent = dash.classes.total;
-    document.getElementById('stFees').textContent = (dash.fees.total_collected/1e6).toFixed(2)+'M';
-    document.getElementById('stBC').textContent = dash.blockchain.blocks;
-  }
+async function apiPost(path, data){
+  try{
+    const r = await fetch(API+path, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    return await r.json();
+  }catch(e){ addLog(`❌ API Error: ${e}`); return null; }
+}
 
-  // Analytics
-  const anal = await fetchJSON(API+'analytics');
-  if(anal) document.getElementById('stScore').textContent = anal.average_score?.toFixed(1)+'%' || '...';
+function showMsg(id, text, ok){
+  const m = document.getElementById(id); m.style.display='block';
+  m.className = 'msg '+(ok?'msg-ok':'msg-err'); m.textContent=text;
+  setTimeout(()=>m.style.display='none',3000);
+}
+
+// === ADD STUDENT ===
+document.getElementById('addStudentForm').onsubmit = async function(e){
+  e.preventDefault();
+  const fd = new FormData(this);
+  const data = Object.fromEntries(fd.entries());
+  addLog(`📝 Registering: ${data.first_name} ${data.last_name}...`);
+
+  const r = await apiPost('/register_student', data);
+  if(r && r.status === 'registered'){
+    showMsg('stuMsg', `✅ ${r.student.name} registered! ID: ${r.student.id}`, true);
+    addLog(`✅ Student registered: ${r.student.id}`);
+    this.reset();
+    loadAll();
+  } else {
+    showMsg('stuMsg', '❌ Failed to register', false);
+  }
+};
+
+// === RECORD FEE ===
+document.getElementById('feeForm').onsubmit = async function(e){
+  e.preventDefault();
+  const fd = new FormData(this);
+  const data = Object.fromEntries(fd.entries());
+  data.amount = parseInt(data.amount); data.year = 2026;
+  addLog(`💰 Recording fee: TZS ${data.amount} for ${data.student_id}...`);
+
+  const r = await apiPost('/record_fee_payment', data);
+  if(r && r.status === 'paid'){
+    showMsg('feeMsg', `✅ TZS ${r.amount} paid! Receipt: ${r.receipt}`, true);
+    addLog(`💰 Fee recorded: TZS ${r.amount}`);
+    loadAll();
+  } else {
+    showMsg('feeMsg', '❌ Payment failed', false);
+  }
+};
+
+// === ENTER EXAM ===
+document.getElementById('examForm').onsubmit = async function(e){
+  e.preventDefault();
+  const fd = new FormData(this);
+  const data = Object.fromEntries(fd.entries());
+  const sid = data.student_id;
+  const subjects = [
+    {subject:'Mathematics',score:parseInt(data.math)},
+    {subject:'English',score:parseInt(data.english)},
+    {subject:'Kiswahili',score:parseInt(data.kiswahili)},
+    {subject:'Science',score:parseInt(data.science)}
+  ];
+  addLog(`📊 Entering exam results for ${sid}...`);
+
+  const r = await apiPost('/enter_exam_results', {
+    student_id: sid, exam_name: 'Mid-Term', term: 'Term 1', year: 2026, subjects
+  });
+  if(r && r.status === 'recorded'){
+    const res = r.result;
+    showMsg('examMsg', `✅ Avg: ${res.average.toFixed(1)}% | Grade: ${res.grade}`, true);
+    addLog(`📊 Exam recorded: ${res.average.toFixed(0)}% (Grade ${res.grade})`);
+    loadAll();
+  } else {
+    showMsg('examMsg', '❌ Failed to record exam', false);
+  }
+};
+
+// === LOAD ALL DATA ===
+async function loadAll(){
+  const dash = await apiGet('/dashboard');
+  if(dash){
+    document.getElementById('statsRow').innerHTML = `
+      <div class="st"><div class="v">${dash.students.total}</div><div class="l">Students</div></div>
+      <div class="st"><div class="v">${dash.teachers.total}</div><div class="l">Teachers</div></div>
+      <div class="st"><div class="v">${dash.classes.total}</div><div class="l">Classes</div></div>
+      <div class="st"><div class="v">${(dash.fees.total_collected/1e6).toFixed(1)}M</div><div class="l">Fees (TZS)</div></div>
+      <div class="st"><div class="v">${dash.exams.total_recorded}</div><div class="l">Exams</div></div>
+      <div class="st"><div class="v">${dash.blockchain.blocks}</div><div class="l">Blocks</div></div>
+    `;
+    document.getElementById('totalFees').textContent = `TZS ${dash.fees.total_collected.toLocaleString()}`;
+  }
 
   // Students
-  const stu = await fetchJSON(API+'students');
+  const stu = await apiGet('/students');
   if(stu){
-    document.getElementById('stuCount').textContent = '('+stu.total+')';
-    let html = '';
-    stu.students.slice(0,12).forEach(s=>{
-      html += `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.class||'-'}</td><td><span class="tag tag-ok">${s.status}</span></td></tr>`;
-    });
-    document.getElementById('stuTable').innerHTML = html || '<tr><td colspan="4">No students</td></tr>';
-  }
+    document.getElementById('stuCount').textContent = `(${stu.total})`;
+    let h=''; stu.students.forEach(s=>{ h+=`<tr><td>${s.id}</td><td>${s.name}</td><td>${s.class||'-'}</td><td>${s.gender||'-'}</td><td><span class="tag tg">active</span></td></tr>`; });
+    document.getElementById('stuTable').innerHTML = h || '<tr><td colspan="5">No students</td></tr>';
 
-  // Teachers
-  const tch = await fetchJSON(API+'teachers');
-  if(tch){
-    document.getElementById('tchCount').textContent = '('+tch.total+')';
-    let html = '';
-    tch.teachers.forEach(t=>{
-      html += `<tr><td>${t.name}</td><td>${t.qualification}</td><td>${(t.subjects||[]).join(', ')}</td></tr>`;
-    });
-    document.getElementById('tchTable').innerHTML = html || '<tr><td colspan="3">No teachers</td></tr>';
+    // Update student selects
+    let opts = '<option value="">Select Student...</option>';
+    stu.students.forEach(s=>{ opts+=`<option value="${s.id}">${s.name} (${s.id})</option>`; });
+    document.getElementById('feeStudentSelect').innerHTML = opts;
+    document.getElementById('examStudentSelect').innerHTML = opts;
   }
 
   // Rankings
-  const classes = await fetchJSON(API+'classes');
-  if(classes && classes.length > 0){
-    // Simulate rankings (real API would return this)
-    const rankings = [
-      {pos:1,name:'Hamisi Bakari',score:65.2,grade:'B'},
-      {pos:2,name:'Mwajuma Salum',score:55.8,grade:'C'},
-      {pos:3,name:'Paulo Mbaga',score:55.2,grade:'C'},
-      {pos:4,name:'DR JACKSON MBILINYI',score:92.5,grade:'A'},
-    ];
-    let html = '';
-    rankings.forEach(r=>{
-      html += `<tr>
-        <td><b>#${r.pos}</b></td><td>${r.name}</td><td>${r.score}%</td>
-        <td><span class="tag-${r.grade}">${r.grade}</span></td>
-        <td><div class="progress-bar"><div class="progress-fill" style="width:${r.score}%"></div></div></td>
-      </tr>`;
+  const rankings = await apiGet('/class_results?class_id=FORM-1&exam_name=Mid-Term');
+  if(rankings && rankings.rankings){
+    let h=''; rankings.rankings.forEach(r=>{
+      h+=`<tr><td><b>#${r.position}</b></td><td>${r.name}</td><td>${r.average.toFixed(1)}%</td>
+        <td><b style="color:${r.grade==='A'?'#22d3a0':r.grade==='B'?'#38bdf8':r.grade==='C'?'#f0c040':'#ef4444'}">${r.grade}</b></td>
+        <td><div class="progress-bar"><div class="progress-fill" style="width:${r.average}%"></div></div></td></tr>`;
     });
-    document.getElementById('rankTable').innerHTML = html;
+    document.getElementById('rankTable').innerHTML = h || '<tr><td colspan="5">No exam results yet</td></tr>';
   }
 }
 
+addLog('🚀 System started — Connected to Python Backend');
+addLog('📡 API Ready: /api/dashboard, /api/students, /api/teachers');
 loadAll();
-setInterval(loadAll, 10000);
+setInterval(loadAll, 5000);
 </script>
 </body>
 </html>
