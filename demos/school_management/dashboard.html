@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏫 Smart Academy — T-PYTREXT</title>
+<style>
+:root{--bg:#0a0f1a;--card:#111827;--gold:#f0c040;--text:#e2e8f0;--muted:#64748b;--border:#1e293b;--green:#22d3a0;--red:#ef4444;--blue:#38bdf8;--purple:#a855f7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.header{background:linear-gradient(135deg,#111827,#1a1a2e);border-bottom:1px solid var(--border);padding:16px 30px;display:flex;justify-content:space-between;align-items:center}
+.header h1{background:linear-gradient(135deg,#f7d774,#f0c040,#c8960c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:24px}
+.header .badge{font-size:10px;color:var(--muted);letter-spacing:2px}
+.content{max-width:1300px;margin:0 auto;padding:20px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:all 0.3s}
+.stat:hover{border-color:rgba(240,192,64,0.3);transform:translateY(-2px)}
+.stat .v{font-size:32px;font-weight:900;color:var(--gold)}
+.stat .l{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+
+/* Grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px}
+.card h2{font-size:16px;color:var(--gold);margin-bottom:15px;letter-spacing:1px;text-transform:uppercase}
+.card h2 span{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03)}
+tr:hover{background:rgba(255,255,255,0.02)}
+.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+.tag-ok{background:rgba(34,211,160,0.15);color:var(--green)}
+.tag-warn{background:rgba(234,179,8,0.15);color:#eab308}
+.tag-A{color:var(--green);font-weight:900}.tag-B{color:var(--blue)}.tag-C{color:var(--gold)}.tag-F{color:var(--red)}
+
+.progress-bar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.8s ease}
+
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.btn{padding:10px 20px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.03);color:var(--text);cursor:pointer;font-size:13px;transition:all 0.2s;letter-spacing:0.5px}
+.btn:hover,.btn.active{border-color:var(--gold);background:rgba(240,192,64,0.08)}
+.btn.act{border-color:var(--gold);background:rgba(240,192,64,0.12);color:var(--gold)}
+
+.footer{text-align:center;color:var(--muted);font-size:10px;padding:20px;border-top:1px solid var(--border);margin-top:20px}
+.loading{text-align:center;color:var(--muted);padding:40px;animation:pulse 1s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🏫 Smart Academy</h1>
+  <span class="badge">Built with T-PYTREXT</span>
+</div>
+
+<div class="content">
+  <div id="stats" class="stats">
+    <div class="stat"><div class="v" id="stStudents">...</div><div class="l">Students</div></div>
+    <div class="stat"><div class="v" id="stTeachers">...</div><div class="l">Teachers</div></div>
+    <div class="stat"><div class="v" id="stClasses">...</div><div class="l">Classes</div></div>
+    <div class="stat"><div class="v" id="stFees">...</div><div class="l">Fees (TZS)</div></div>
+    <div class="stat"><div class="v" id="stScore">...</div><div class="l">Avg Score</div></div>
+    <div class="stat"><div class="v" id="stBC">...</div><div class="l">Blockchain</div></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn act" onclick="loadAll()">🔄 Refresh</button>
+    <button class="btn" onclick="alert('📝 New Student\n\nUse: pytrex API → register_student')">➕ Add Student</button>
+    <button class="btn" onclick="alert('💰 Record Fee\n\nUse: pytrex API → record_fee_payment')">💰 Record Fee</button>
+    <button class="btn" onclick="alert('📜 Issue Certificate\n\nUse: pytrex API → issue_certificate')">📜 Certificate</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>👨‍🎓 Students <span id="stuCount"></span></h2>
+      <table><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Status</th></tr></thead>
+      <tbody id="stuTable"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody></table>
+    </div>
+    <div class="card">
+      <h2>👨‍🏫 Teachers <span id="tchCount"></span></h2>
+      <table><thead><tr><th>Name</th><th>Qualification</th><th>Subjects</th></tr></thead>
+      <tbody id="tchTable"><tr><td colspan="3" class="loading">Loading...</td></tr></tbody></table>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <h2>📊 Exam Rankings — Form 1</h2>
+      <table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Grade</th><th>Progress</th></tr></thead>
+      <tbody id="rankTable"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="footer">T-PYTREXT School Management System &copy; 2026 — Built by DR JACKSON MBILINYI 🇹🇿</div>
+
+<script>
+const API = 'http://localhost:8080/api/';
+
+async function fetchJSON(url){
+  try{ const r=await fetch(url); return await r.json(); }
+  catch(e){ console.error(e); return null; }
+}
+
+async function loadAll(){
+  // Dashboard
+  const dash = await fetchJSON(API+'dashboard');
+  if(dash){
+    document.getElementById('stStudents').textContent = dash.students.total;
+    document.getElementById('stTeachers').textContent = dash.teachers.total;
+    document.getElementById('stClasses').textContent = dash.classes.total;
+    document.getElementById('stFees').textContent = (dash.fees.total_collected/1e6).toFixed(2)+'M';
+    document.getElementById('stBC').textContent = dash.blockchain.blocks;
+  }
+
+  // Analytics
+  const anal = await fetchJSON(API+'analytics');
+  if(anal) document.getElementById('stScore').textContent = anal.average_score?.toFixed(1)+'%' || '...';
+
+  // Students
+  const stu = await fetchJSON(API+'students');
+  if(stu){
+    document.getElementById('stuCount').textContent = '('+stu.total+')';
+    let html = '';
+    stu.students.slice(0,12).forEach(s=>{
+      html += `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.class||'-'}</td><td><span class="tag tag-ok">${s.status}</span></td></tr>`;
+    });
+    document.getElementById('stuTable').innerHTML = html || '<tr><td colspan="4">No students</td></tr>';
+  }
+
+  // Teachers
+  const tch = await fetchJSON(API+'teachers');
+  if(tch){
+    document.getElementById('tchCount').textContent = '('+tch.total+')';
+    let html = '';
+    tch.teachers.forEach(t=>{
+      html += `<tr><td>${t.name}</td><td>${t.qualification}</td><td>${(t.subjects||[]).join(', ')}</td></tr>`;
+    });
+    document.getElementById('tchTable').innerHTML = html || '<tr><td colspan="3">No teachers</td></tr>';
+  }
+
+  // Rankings
+  const classes = await fetchJSON(API+'classes');
+  if(classes && classes.length > 0){
+    // Simulate rankings (real API would return this)
+    const rankings = [
+      {pos:1,name:'Hamisi Bakari',score:65.2,grade:'B'},
+      {pos:2,name:'Mwajuma Salum',score:55.8,grade:'C'},
+      {pos:3,name:'Paulo Mbaga',score:55.2,grade:'C'},
+      {pos:4,name:'DR JACKSON MBILINYI',score:92.5,grade:'A'},
+    ];
+    let html = '';
+    rankings.forEach(r=>{
+      html += `<tr>
+        <td><b>#${r.pos}</b></td><td>${r.name}</td><td>${r.score}%</td>
+        <td><span class="tag-${r.grade}">${r.grade}</span></td>
+        <td><div class="progress-bar"><div class="progress-fill" style="width:${r.score}%"></div></div></td>
+      </tr>`;
+    });
+    document.getElementById('rankTable').innerHTML = html;
+  }
+}
+
+loadAll();
+setInterval(loadAll, 10000);
+</script>
+</body>
+</html>
