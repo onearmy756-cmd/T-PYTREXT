@@ -1,0 +1,6 @@
+{
+  "appId": "com.onearmy.pytrex",
+  "appName": "PyTreX",
+  "webDir": "frontend",
+  "bundledWebRuntime": false
+}

@@ -1,0 +1,11 @@
+{
+  "name": "PyTreX",
+  "short_name": "PyTreX",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#222222",
+  "theme_color": "#00bcd4",
+  "icons": [
+    { "src": "/icons/icon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}
