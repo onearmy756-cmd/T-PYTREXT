@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PyTreX App</title>
+    <meta name="theme-color" content="#00bcd4">
+    <link rel="manifest" href="manifest.webmanifest">
     <style>
         body { font-family: sans-serif; text-align: center; background: #222; color: white; padding-top: 50px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #00bcd4; border: none; border-radius: 5px; }
@@ -15,6 +19,17 @@
     <script>
         function tumaKwendaAI() {
             alert("Inatuma data kwenda kwenye PyTorch Core...");
+        }
+
+        // Register service worker for PWA offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js').then(function(reg) {
+                    console.log('ServiceWorker registration successful with scope: ', reg.scope);
+                }).catch(function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
         }
     </script>
 </body>

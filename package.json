@@ -1,0 +1,14 @@
+{
+  "name": "pytrex-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:web": "echo \"frontend is static; no build step\"",
+    "cap:init": "npx @capacitor/cli@latest init pytrex com.onearmy.pytrex --web-dir=frontend --npm-client=npm || true",
+    "cap:sync": "npx cap sync",
+    "cap:add-android": "npx cap add android || true",
+    "cap:add-ios": "npx cap add ios || true",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios"
+  }
+}
