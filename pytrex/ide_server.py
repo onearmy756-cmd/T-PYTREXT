@@ -425,6 +425,10 @@ class IDEServer:
             return {"_status": 400, "_raw": "bad path", "_ctype": "text/plain"}
         full = os.path.join(build, rel)
         if not os.path.isfile(full):
+            # SPA fallback: routes za canvas (/ide/conversations, /ide/settings,
+            # n.k.) hazina faili — zirudishe index.html ili router ichukue.
+            if not os.path.splitext(rel)[1]:
+                return self._serve_canvas_index()
             return {"_status": 404, "_raw": "not found", "_ctype": "text/plain"}
         ctype = _content_type(full)
         if ctype.startswith("text/") or ctype.endswith(("javascript", "json", "svg+xml")):

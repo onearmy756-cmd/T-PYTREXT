@@ -179,7 +179,7 @@ class TestAgentServerProtocol:
     def test_server_info_version(self, server):
         st, body = _http(8137, "/server_info")
         assert st == 200
-        assert body["version"] == "1.32.0"
+        assert body["version"] == "1.51.0"
         assert "workspaces" in body["capabilities"]
 
     def test_probes(self, server):
@@ -223,7 +223,11 @@ class TestAgentServerProtocol:
         for path in ("/api/profiles", "/api/meta-profiles",
                      "/api/automation/sdk-version", "/api/llm/models/verified",
                      "/api/llm/models", "/api/settings/agent-schema",
-                     "/api/agent-profiles"):
+                     "/api/agent-profiles", "/api/workspaces", "/api/file/home",
+                     "/api/hooks", "/api/plugins/installed",
+                     "/api/settings/secrets", "/api/automation/health",
+                     "/api/automation/v1", "/api/canvas-extensions/installed",
+                     "/api/conversations/search", "/api/profiles/gpt-4o-mini"):
             st, body = _http(8137, path)
             assert st == 200, path
             assert isinstance(body, dict), path
@@ -259,6 +263,17 @@ class TestCanvasServing:
         with urllib.request.urlopen(url, timeout=10) as resp:
             html = resp.read().decode()
         assert "/ide/assets/" in html
+
+    def test_ide_spa_subroutes_fallback(self, server):
+        # Router ya canvas ina routes (/ide/conversations, /ide/settings) ambazo
+        # hazina faili — server LAZIMA irudishe index.html, sivyo 404.
+        for route in ("/ide/conversations", "/ide/settings", "/ide/automations"):
+            st, _ = _http(8137, route)
+            assert st == 200, route
+
+    def test_ide_missing_asset_404(self, server):
+        st, _ = _http(8137, "/ide/assets/nope.js")
+        assert st == 404
 
 
 # ═══════════════════════════════════════════════════════════

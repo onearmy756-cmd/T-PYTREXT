@@ -48,8 +48,8 @@ from typing import Any, Dict, List, Optional
 from .ide import IDEEngine
 from .ide_server import IDEServer, ToolBridge
 
-AGENT_SERVER_VERSION = "1.32.0"   # inatosheleza minVersion ya canvas (mcp-oauth 1.31.0)
-SDK_VERSION = "1.32.0"
+AGENT_SERVER_VERSION = "1.51.0"   # inatosheleza minVersion ya canvas (config/defaults.json)
+SDK_VERSION = "1.51.0"
 
 # ═══════════════════════════════════════════════════════════
 # Events (muundo wa OpenHands)
@@ -477,6 +477,26 @@ class AgentServer(IDEServer):
             return {"providers": []}
         if path == "/api/settings/agent-schema" or path == "/api/v1/settings/agent-schema":
             return self._agent_schema()
+        if path == "/api/workspaces":
+            return {"workspaces": [], "workspaceParents": []}
+        if path == "/api/file/home":
+            return {"home": self.workspace,
+                    "favorites": [{"label": "Workspace", "path": self.workspace}],
+                    "locations": []}
+        if path == "/api/skills" and method == "POST":
+            return {"skills": []}
+        if path == "/api/hooks":
+            return {"hooks": []}
+        if path == "/api/plugins/installed":
+            return {"plugins": [], "items": []}
+        if path in ("/api/settings/secrets", "/api/secrets"):
+            return {"secrets": [], "items": []}
+        if path == "/api/auth/workspace-session":
+            return {"status": "ok"}
+        if path in ("/api/automation/health", "/api/automation/v1"):
+            return {"status": "ok"}
+        if path.startswith("/api/automation/"):
+            return {"status": "ok"}
         if path == "/api/v1/settings/conversation-schema":
             return {"type": "object", "properties": {}}
         if path == "/api/v1/web-client/config":
