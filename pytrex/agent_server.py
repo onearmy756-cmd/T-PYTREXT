@@ -497,8 +497,8 @@ class AgentServer(IDEServer):
             return {"status": "ok"}
         if path.startswith("/api/automation/"):
             return {"status": "ok"}
-        if path == "/api/v1/settings/conversation-schema":
-            return {"type": "object", "properties": {}}
+        if path == "/api/v1/settings/conversation-schema" or path == "/api/settings/conversation-schema":
+            return self._conversation_schema()
         if path == "/api/v1/web-client/config":
             return {"app_mode": "local", "feature_flags": {}}
         if path == "/api/authenticate":
@@ -666,14 +666,58 @@ class AgentServer(IDEServer):
         return {"status": "ok", "message": f"saved {name}", "name": name}
 
     def _agent_schema(self) -> dict:
-        """JSON schema ndogo ya settings za agent (kwa UI ya canvas)."""
+        """Schema ya settings za agent kwa UI ya canvas.
+
+        Canvas hupitia `sections` na kutafuta `key === "llm"` (llm-settings /
+        onboarding). Bila `sections` UI huanguka ("Cannot read properties of
+        undefined (reading 'find')"), kwa hivyo muundo huu ni wa lazima.
+        """
+        llm_fields = [
+            self._field("llm.model", "Model", "llm", "string",
+                        default="gpt-4o-mini", required=True, prominence="critical"),
+            self._field("llm.api_key", "API Key", "llm", "string",
+                        secret=True, prominence="critical"),
+            self._field("llm.base_url", "Base URL", "llm", "string",
+                        prominence="critical"),
+            self._field("llm.temperature", "Temperature", "llm", "number"),
+        ]
         return {
-            "type": "object",
-            "properties": {
-                "llm_model": {"type": "string", "title": "LLM Model"},
-                "llm_base_url": {"type": "string", "title": "Base URL"},
-                "confirmation_mode": {"type": "boolean", "title": "Confirmation Mode"},
-            },
+            "model_name": "AgentSettings",
+            "sections": [
+                {"key": "llm", "label": "LLM", "fields": llm_fields},
+                {"key": "general", "label": "General", "fields": [
+                    self._field("tool_concurrency_limit", "Parallel tool calls",
+                                "general", "integer", default=1),
+                ]},
+            ],
+        }
+
+    @staticmethod
+    def _field(key: str, label: str, section: str, value_type: str,
+               default: Any = None, secret: bool = False,
+               required: bool = False,
+               prominence: str = "major") -> dict:
+        return {
+            "key": key, "label": label, "section": section,
+            "section_label": section.capitalize(), "value_type": value_type,
+            "default": default, "choices": [], "depends_on": [],
+            "prominence": prominence, "secret": secret, "required": required,
+        }
+
+    def _conversation_schema(self) -> dict:
+        """Schema ya settings za mazungumzo (Canvas huitumia kama fallback)."""
+        return {
+            "model_name": "ConversationSettings",
+            "sections": [
+                {"key": "conversation", "label": "Conversation", "fields": [
+                    self._field("max_iterations", "Max iterations",
+                                "conversation", "integer",
+                                default=self.runtime.max_iterations,
+                                prominence="critical"),
+                    self._field("confirmation_mode", "Confirmation mode",
+                                "conversation", "boolean", default=False),
+                ]},
+            ],
         }
 
     def _skills_payload(self) -> dict:
@@ -724,6 +768,10 @@ class AgentServer(IDEServer):
 
         class Handler(base):  # type: ignore[misc, valid-type]
             def do_GET(self):
+                # Editor halisi (`/ide/vscode`) ina WebSocket zake — proxy kwanza.
+                if server._is_editor_path(self.path):
+                    server._proxy_editor(self)
+                    return
                 if self.headers.get("Upgrade", "").lower() == "websocket":
                     self._ws(server)
                     return

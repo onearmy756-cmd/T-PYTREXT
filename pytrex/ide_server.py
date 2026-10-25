@@ -31,6 +31,11 @@ from __future__ import annotations
 
 import json
 import os
+import select
+import shutil
+import socket
+import subprocess
+import tempfile
 import threading
 import time
 import traceback
@@ -49,8 +54,13 @@ from .core import (
 )
 from .search_engine import SearchEngine as WebSearchEngine
 from .ide import IDEEngine, IDEToolRegistry, ide_home
+from .editor import EditorServer, DEFAULT_EDITOR_PORT
 
 IDE_SERVER_VERSION = "1.0.0"
+
+
+class _StopProxy(Exception):
+    """Ishara ya kumaliza proxy loop (socket moja imefungwa)."""
 
 
 # ═══════════════════════════════════════════════════════════
@@ -281,6 +291,14 @@ class IDEServer:
         # moja kwa moja. Server hii haitekelezi auth ya lazima (local), kwa
         # hivyo token ni kwa ajili ya kuunganisha UI pekee.
         self.session_api_key = os.environ.get("MTS_IDE_SESSION_KEY") or uuid.uuid4().hex
+        # Editor halisi (OpenVSCode Server) nyuma ya `/ide/vscode`.
+        self.editor = EditorServer(
+            workspace=self.workspace,
+            port=int(os.environ.get("MTS_EDITOR_PORT", DEFAULT_EDITOR_PORT)),
+            token=self.session_api_key,
+        )
+        self.editor_base_path = self.editor.base_path
+        self.editor_upstream = ("127.0.0.1", self.editor.port)
 
     # ---------- routing ----------
 
@@ -307,6 +325,16 @@ class IDEServer:
         if path == "/api/ide/tools":
             return {"ok": True, "data": self.engine.tools.catalog()}
 
+        # ---- editor halisi (OpenVSCode Server) ----
+        if path in ("/api/vscode/status", "/api/ide/editor/status"):
+            return self.editor.status()
+        if path == "/api/vscode/url":
+            base_url = query.get("base_url") or f"http://{self.host}:{self.port}"
+            return {"url": self.editor.url(base_url)}
+        if path == "/api/ide/editor/start" and method == "POST":
+            return self.editor.start()
+        if path == "/api/ide/editor/stop" and method == "POST":
+            return self.editor.stop()
         if path == "/api/ide/plan":
             return {"ok": True, "data": self.engine.plan()}
 
@@ -437,6 +465,216 @@ class IDEServer:
         with open(full, "rb") as f:
             return {"_raw": f.read(), "_status": 200, "_ctype": ctype}
 
+    # ---------- editor proxy ----------
+
+    def _is_editor_path(self, path: str) -> bool:
+        base = self.editor_base_path
+        p = path.split("?", 1)[0]
+        return p == base or p.startswith(base + "/")
+
+    def _proxy_editor(self, handler) -> None:
+        """Proxy halisi (HTTP + WebSocket) kwa OpenVSCode Server.
+
+        Tunaunganisha socket mbili (kivinjari ↔ editor) na kupitisha bytes
+        mbichi pande zote mbili. Hii inaunga mkono HTTP ya kawaida pamoja na
+        `Upgrade: websocket` (ambayo editor inahitaji kwa terminal, LSP, n.k.).
+        """
+        import socket as _socket
+
+        # Proxy inashikilia socket yenyewe — zuia keep-alive ya handler.
+        handler.close_connection = True
+
+        if not self.editor.running:
+            body = b"editor not running"
+            handler.send_response(503)
+            handler.send_header("Content-Type", "text/plain")
+            handler.send_header("Content-Length", str(len(body)))
+            handler.end_headers()
+            handler.wfile.write(body)
+            return
+
+        # Jenga ombi la awali ili kulihamishia kwa editor.
+        method = handler.command
+        req_path = handler.path
+        # Ondoa `tkn` kabla ya kupeleka: editor huitumia kama token ya
+        # kuunganisha na hulazimika kurudisha 302 inayoiondoa (kisha kivinjari
+        # hukwama kwenye 403 iliyohifadhiwa). Tunaiweka kama cookie hapa chini,
+        # ambayo ndiyo njia editor inayotumia kuthibitisha maombi yanayofuata.
+        if "?" in req_path:
+            _p, _, _q = req_path.partition("?")
+            _kept_q = "&".join(kv for kv in _q.split("&")
+                               if kv and not kv.startswith("tkn="))
+            req_path = f"{_p}?{_kept_q}" if _kept_q else _p
+        if os.environ.get("MTS_IDE_ACCESS_LOG"):
+            up = handler.headers.get("Upgrade", "")
+            print(f"[editor] {method} {req_path} upgrade={up}", flush=True)
+        try:
+            length = int(handler.headers.get("Content-Length", 0) or 0)
+        except ValueError:
+            length = 0
+        body = handler.rfile.read(length) if length else b""
+
+        try:
+            conn = _socket.create_connection(self.editor_upstream, timeout=10.0)
+        except OSError as e:  # noqa: BLE001
+            payload = f"editor unreachable: {e}".encode()
+            handler.send_response(502)
+            handler.send_header("Content-Type", "text/plain")
+            handler.send_header("Content-Length", str(len(payload)))
+            handler.end_headers()
+            handler.wfile.write(payload)
+            return
+
+        # WebSocket/upgrade huhitaji pipe mbichi ya pande mbili. HTTP ya
+        # kawaida hutumia http.client: pipe mbichi hurudisha
+        # `Transfer-Encoding: chunked` + `Connection: keep-alive` (hop-by-hop)
+        # kwa mteja wa HTTP/2, na LB hukata stream hiyo kwa JS/CSS za workbench
+        # (ERR_HTTP2_PROTOCOL_ERROR).
+        if not handler.headers.get("Upgrade"):
+            self._relay_http(handler, method, req_path, body)
+            return
+
+        try:
+            conn = _socket.create_connection(self.editor_upstream, timeout=10.0)
+        except OSError as e:  # noqa: BLE001
+            payload = f"editor unreachable: {e}".encode()
+            handler.send_response(502)
+            handler.send_header("Content-Type", "text/plain")
+            handler.send_header("Content-Length", str(len(payload)))
+            handler.end_headers()
+            handler.wfile.write(payload)
+            return
+
+        # Tuma ombi la mwanzo (headers zote). Tunahifadhi Host halisi — editor
+        # hutumia Host kujenga `remoteAuthority` ambayo kivinjari hutumia
+        # kuunganisha WebSocket. Kuibadilisha kwake ni kumwelekeza kivinjari
+        # kwenye `127.0.0.1:8001` isiyofikika.
+        lines = [f"{method} {req_path} HTTP/1.1"]
+        if not any(k.lower() == "host" for k in handler.headers.keys()):
+            lines.append(f"Host: 127.0.0.1:{self.editor.port}")
+        # Badilisha `vscode-tkn` YOYOTE: kivinjari huweka cookie ya kikao
+        # kilichopita, na editor husoma ya kwanza pekee — cookie mbili
+        # hupelekea 403 "Forbidden" isiyoeleweka.
+        cookie_hdr = handler.headers.get("Cookie", "")
+        kept = [c.strip() for c in cookie_hdr.split(";")
+                if c.strip() and not c.strip().startswith("vscode-tkn=")]
+        if self.editor.token:
+            kept.append(f"vscode-tkn={self.editor.token}")
+        if kept:
+            lines.append("Cookie: " + "; ".join(kept))
+        for k, v in handler.headers.items():
+            if k.lower() == "cookie":
+                continue  # imeunganishwa juu
+            lines.append(f"{k}: {v}")
+        # USIINGIZE X-Forwarded-* mara ya pili: kama zipo tayari (kutoka LB),
+        # kurudia hupelekea editor kuunganisha thamani kwa koma → remoteAuthority
+        # inakuwa "host, host:443" → CSP mbovu na WebSocket URL isiyo sahihi.
+        _have = {k.lower() for k in handler.headers.keys()}
+        if "x-forwarded-host" not in _have:
+            lines.append(f"X-Forwarded-Host: {handler.headers.get('Host', '')}")
+        if "x-forwarded-proto" not in _have:
+            lines.append("X-Forwarded-Proto: https")
+        if os.environ.get("MTS_IDE_ACCESS_LOG"):
+            print(f"[editor] fwd={lines[1:]}", flush=True)
+        raw = ("\r\n".join(lines) + "\r\n\r\n").encode("latin-1") + body
+        try:
+            conn.sendall(raw)
+        except OSError:
+            conn.close()
+            return
+
+        client = handler.connection
+        try:
+            conn.setblocking(False)
+            client.setblocking(False)
+            first = True
+            while True:
+                r, _w, x = select.select([conn, client], [], [conn, client], 60.0)
+                if x:
+                    break
+                if not r:
+                    break
+                for src in r:
+                    dst = client if src is conn else conn
+                    try:
+                        data = src.recv(65536)
+                    except (BlockingIOError, InterruptedError):
+                        continue
+                    except OSError:
+                        data = b""
+                    if not data:
+                        raise _StopProxy()
+                    if first and src is conn and os.environ.get("MTS_IDE_ACCESS_LOG"):
+                        print(f"[editor] resp={data.splitlines()[0]!r}", flush=True)
+                    first = False
+                    dst.sendall(data)
+        except (_StopProxy, OSError):
+            pass
+        finally:
+            try:
+                conn.close()
+            except OSError:
+                pass
+            try:
+                client.close()
+            except OSError:
+                pass
+
+    def _relay_http(self, handler, method: str, req_path: str, body: bytes) -> None:
+        """Hamisha ombi la HTTP la kawaida kwenda editor kwa http.client."""
+        import http.client as _http
+
+        hop = {"connection", "keep-alive", "proxy-connection", "transfer-encoding",
+               "upgrade", "te", "trailer", "proxy-authenticate",
+               "proxy-authorization"}
+        fwd: Dict[str, str] = {}
+        for k, v in handler.headers.items():
+            lk = k.lower()
+            if lk in hop or lk == "cookie":
+                continue
+            fwd[k] = v
+        fwd["Host"] = handler.headers.get("Host", f"127.0.0.1:{self.editor.port}")
+        cookie_hdr = handler.headers.get("Cookie", "")
+        kept = [c.strip() for c in cookie_hdr.split(";")
+                if c.strip() and not c.strip().startswith("vscode-tkn=")]
+        if self.editor.token:
+            kept.append(f"vscode-tkn={self.editor.token}")
+        if kept:
+            fwd["Cookie"] = "; ".join(kept)
+        present = {k.lower() for k in fwd}
+        if "x-forwarded-host" not in present:
+            fwd["X-Forwarded-Host"] = handler.headers.get("Host", "")
+        if "x-forwarded-proto" not in present:
+            fwd["X-Forwarded-Proto"] = "https"
+
+        conn = _http.HTTPConnection(self.editor_upstream[0],
+                                    self.editor_upstream[1], timeout=30)
+        try:
+            conn.request(method, req_path, body=body or None, headers=fwd)
+            resp = conn.getresponse()
+            payload = resp.read()
+            handler.send_response(resp.status)
+            for k, v in resp.getheaders():
+                if k.lower() in hop:
+                    continue
+                handler.send_header(k, v)
+            handler.send_header("Content-Length", str(len(payload)))
+            handler.end_headers()
+            if method != "HEAD":
+                handler.wfile.write(payload)
+        except (OSError, _http.HTTPException) as e:  # noqa: BLE001
+            payload = f"editor unreachable: {e}".encode()
+            handler.send_response(502)
+            handler.send_header("Content-Type", "text/plain")
+            handler.send_header("Content-Length", str(len(payload)))
+            handler.end_headers()
+            handler.wfile.write(payload)
+        finally:
+            try:
+                conn.close()
+            except OSError:
+                pass
+
     # ---------- server ----------
 
     def _make_handler(self):
@@ -449,6 +687,10 @@ class IDEServer:
             def _dispatch(self, method: str):
                 parsed = urllib.parse.urlparse(self.path)
                 query = dict(urllib.parse.parse_qsl(parsed.query))
+                # Editor halisi: `/ide/vscode` (HTTP + WebSocket) inaenda kwa proxy.
+                if server._is_editor_path(parsed.path):
+                    server._proxy_editor(self)
+                    return
                 length = int(self.headers.get("Content-Length", 0) or 0)
                 body = self.rfile.read(length).decode("utf-8") if length else ""
                 if os.environ.get("MTS_IDE_ACCESS_LOG"):
@@ -499,6 +741,9 @@ class IDEServer:
     def start(self, background: bool = True) -> dict:
         if self._httpd is not None:
             return {"status": "ok", "message": "tayari inaendesha", "port": self.port}
+        editor_result = None
+        if self.editor.enabled and os.environ.get("MTS_EDITOR_AUTOSTART", "1") != "0":
+            editor_result = self.editor.start()
         self._httpd = ThreadingHTTPServer((self.host, self.port), self._make_handler())
         if background:
             self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
@@ -510,6 +755,7 @@ class IDEServer:
             "url": f"http://{self.host}:{self.port}/ide",
             "api": f"http://{self.host}:{self.port}/api/status",
             "canvas_built": bool(self._canvas_build_dir()),
+            "editor": editor_result or self.editor.status(),
         }
 
     def stop(self) -> dict:
@@ -517,6 +763,7 @@ class IDEServer:
             return {"status": "ok", "message": "haijaendesha"}
         self._httpd.shutdown()
         self._httpd = None
+        self.editor.stop()
         return {"status": "ok", "message": "imesimamishwa"}
 
 

@@ -168,6 +168,7 @@ def _http(port, path, data=None, method=None):
 
 @pytest.fixture
 def server(tmp_path):
+    os.environ["MTS_EDITOR_AUTOSTART"] = "0"
     srv = AgentServer(host="127.0.0.1", port=8137, workspace=str(tmp_path))
     srv.start(background=True)
     time.sleep(0.3)
@@ -274,6 +275,133 @@ class TestCanvasServing:
     def test_ide_missing_asset_404(self, server):
         st, _ = _http(8137, "/ide/assets/nope.js")
         assert st == 404
+
+    def test_vscode_path_is_not_canvas_spa(self, server):
+        # `/ide/vscode` LAZIMA isirudishe SPA ya canvas (ilikuwa ikirudisha
+        # index.html kama fallback — kitufe "Open Workspace" kilidanganya).
+        # Bila editor inayoendesha hii hurudisha 503 wazi, sivyo 302/200.
+        st, body = _http(8137, "/ide/vscode")
+        assert st in (302, 200, 403, 503)
+        raw = body.get("_raw", "") if isinstance(body, dict) else ""
+        assert "__AGENT_CANVAS_BASE_PATH__" not in raw
+
+    def test_vscode_status_route(self, server):
+        st, body = _http(8137, "/api/vscode/status")
+        assert st == 200
+        assert set(("enabled", "running", "message")) <= set(body)
+
+    def test_vscode_url_route(self, server):
+        st, body = _http(8137, "/api/vscode/url")
+        assert st == 200
+        assert "url" in body
+
+
+class _FakeProc:
+    """Proc bandia: `poll()` hurudisha None → editor "inaendesha"."""
+
+    def poll(self):
+        return None
+
+    def terminate(self):
+        pass
+
+    def wait(self, timeout=None):
+        return 0
+
+
+class TestEditorProxyFraming:
+    """Proxy LAZIMA ibadilishe majibu ya editor kuwa yenye Content-Length.
+
+    Upstream (OpenVSCode) hujibu kwa `Transfer-Encoding: chunked` +
+    `Connection: keep-alive`. Hizi ni hop-by-hop headers; kuzirudisha kwa
+    mteja wa HTTP/2 hukatisha stream (ERR_HTTP2_PROTOCOL_ERROR) na workbench
+    haipaki. Proxy hurudisha body kamili yenye Content-Length badala yake.
+    """
+
+    @staticmethod
+    def _upstream():
+        import http.server
+        import threading as _threading
+
+        class _H(http.server.BaseHTTPRequestHandler):
+            protocol_version = "HTTP/1.1"
+
+            def do_GET(self):
+                payload = b"console.log('editor asset');\n" * 40
+                self.send_response(200)
+                self.send_header("Content-Type", "text/javascript")
+                self.send_header("Transfer-Encoding", "chunked")
+                self.send_header("Connection", "keep-alive")
+                self.end_headers()
+                self.wfile.write(b"%x\r\n%s\r\n0\r\n\r\n" % (len(payload), payload))
+
+            def log_message(self, *a):  # kimya
+                pass
+
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _H)
+        _threading.Thread(target=srv.serve_forever, daemon=True).start()
+        return srv, srv.server_address[1]
+
+    @staticmethod
+    def _point_at(server, port: int) -> None:
+        server.editor._proc = _FakeProc()
+        server.editor.port = port
+        server.editor_upstream = ("127.0.0.1", port)
+
+    def test_proxy_strips_hop_by_hop_and_sets_length(self, server):
+        import http.client as _httpclient
+
+        up, port = self._upstream()
+        try:
+            self._point_at(server, port)
+            conn = _httpclient.HTTPConnection("127.0.0.1", 8137, timeout=10)
+            conn.request("GET", "/ide/vscode/static/out/x.js",
+                         headers={"Host": "example.test", "Accept-Encoding": "gzip"})
+            resp = conn.getresponse()
+            body = resp.read()
+            assert resp.status == 200
+            assert resp.getheader("Transfer-Encoding") is None
+            assert resp.getheader("Connection") is None
+            assert int(resp.getheader("Content-Length")) == len(body)
+            assert b"editor asset" in body
+            conn.close()
+        finally:
+            up.shutdown()
+
+    def test_proxy_does_not_duplicate_x_forwarded_host(self, server):
+        """X-Forwarded-Host mara mbili → remoteAuthority "host, host:443".
+
+        Hii ilivunja CSP ya editor na WebSocket URL. Proxy LAZIMA itume mara moja.
+        """
+        seen = {}
+
+        import http.server
+        import threading as _threading
+
+        class _H(http.server.BaseHTTPRequestHandler):
+            protocol_version = "HTTP/1.1"
+
+            def do_GET(self):
+                seen["xfh"] = self.headers.get_all("X-Forwarded-Host") or []
+                body = b"ok"
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, *a):
+                pass
+
+        up = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _H)
+        _threading.Thread(target=up.serve_forever, daemon=True).start()
+        try:
+            self._point_at(server, up.server_address[1])
+            st, _ = _http(8137, "/ide/vscode/static/out/x.js")
+            assert st == 200
+            assert len(seen["xfh"]) == 1, seen["xfh"]
+        finally:
+            up.shutdown()
 
 
 # ═══════════════════════════════════════════════════════════
