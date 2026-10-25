@@ -1,0 +1,59 @@
+{
+  "name": "MTECHOS — Mbilinyi Tech",
+  "short_name": "MTECHOS",
+  "description": "MTECHOS: mazingira ya kujenga programu kwa AI — Coding IDE, Usalama wa Mtandao na Uchunguzi wa Kidijitali. Licensed Mbilinyi Tech.",
+  "id": "/ide/",
+  "start_url": "/ide/",
+  "scope": "/ide/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "theme_color": "#0A0503",
+  "background_color": "#0A0503",
+  "lang": "sw",
+  "dir": "ltr",
+  "categories": ["developer", "education", "productivity", "security"],
+  "icons": [
+    {
+      "src": "/ide/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ide/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ide/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/ide/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Coding IDE",
+      "short_name": "IDE",
+      "url": "/ide/"
+    },
+    {
+      "name": "ElimuPro",
+      "short_name": "ElimuPro",
+      "url": "/ide/education"
+    },
+    {
+      "name": "Usalama wa Mtandao",
+      "short_name": "Usalama",
+      "url": "/ide/education?tab=akademia"
+    }
+  ]
+}

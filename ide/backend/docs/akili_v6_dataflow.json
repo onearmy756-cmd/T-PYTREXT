@@ -1,0 +1,38 @@
+{
+  "version": "Akili-V6.0",
+  "name": "full_pipeline",
+  "description": "Data flow kutoka input hadi decision + R + tools",
+  "stages": [
+    {"order": 1, "group": "Perception", "layers": [1, 10], "in": "raw_input", "out": "signal_focus_salience"},
+    {"order": 2, "group": "Memory", "layers": [11, 20], "in": "signal_focus_salience", "out": "memory_context"},
+    {"order": 3, "group": "Thinking", "layers": [21, 30], "in": "memory_context", "out": "thought"},
+    {"order": 4, "group": "Creativity", "layers": [31, 40], "in": "thought", "out": "idea"},
+    {"order": 5, "group": "Emotion", "layers": [41, 50], "in": "idea", "out": "affect"},
+    {"order": 6, "group": "Social", "layers": [51, 60], "in": "affect", "out": "social_model"},
+    {"order": 7, "group": "Ethics", "layers": [61, 70], "in": "social_model", "out": "ethical_judgment"},
+    {"order": 8, "group": "Self", "layers": [71, 80], "in": "ethical_judgment", "out": "identity"},
+    {"order": 9, "group": "Language", "layers": [81, 90], "in": "identity", "out": "expression"},
+    {"order": 10, "group": "Embodiment", "layers": [91, 100], "in": "expression", "out": "body_state"},
+    {"order": 11, "group": "Time", "layers": [101, 110], "in": "body_state", "out": "timeline"},
+    {"order": 12, "group": "World", "layers": [111, 120], "in": "timeline", "out": "world_model"},
+    {"order": 13, "group": "Learning", "layers": [121, 130], "in": "world_model", "out": "learning_signal"},
+    {"order": 14, "group": "Meta", "layers": [131, 140], "in": "learning_signal", "out": "meta_state"},
+    {"order": 15, "group": "Executive", "layers": [141, 150], "in": "meta_state", "out": "plan"},
+    {"order": 16, "group": "Personality", "layers": [151, 160], "in": "plan", "out": "style"},
+    {"order": 17, "group": "Motivation", "layers": [161, 170], "in": "style", "out": "drive"},
+    {"order": 18, "group": "Adaptation", "layers": [171, 180], "in": "drive", "out": "adapted"},
+    {"order": 19, "group": "Wisdom", "layers": [181, 190], "in": "adapted", "out": "wise_judgment"},
+    {"order": 20, "group": "Transcendence", "layers": [191, 200], "in": "wise_judgment", "out": "final_decision"}
+  ],
+  "outputs": [
+    {"name": "decision", "fields": ["action", "confidence", "ethical_allowed", "requires_hitl"]},
+    {"name": "scores_200", "type": "float[200]"},
+    {"name": "r_analysis", "via": "POST /api/akili/v6/r"},
+    {"name": "tools", "gate": "ethics + HITL"},
+    {"name": "brain", "via": "brain.rs remember/recall"}
+  ],
+  "feedback": {
+    "from": ["decision", "tool_outcome"],
+    "to": ["Learning", "Memory", "Meta", "Adaptation"]
+  }
+}

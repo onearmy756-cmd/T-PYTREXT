@@ -1,0 +1,105 @@
+.mbide-root {
+  /* Tumia tokens HALISI za Canvas (theme) — tokens zisizopo zilikuwa
+     zinaangukia rangi za ajabu (bluu juu ya theme ya ember). */
+  --mbide-bg: var(--oh-color-base, #130a07);
+  --mbide-surface: var(--oh-surface, #1e0f0a);
+  --mbide-border: var(--oh-border, #69331a);
+  --mbide-text: var(--oh-foreground, #ffe4d2);
+  --mbide-muted: var(--oh-text-secondary, #f7a472);
+  --mbide-brand: var(--oh-color-primary, #ff6b2c);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--mbide-text);
+  background: var(--mbide-bg);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.mbide-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--mbide-border);
+  background: var(--mbide-surface);
+  flex-wrap: wrap;
+}
+
+.mbide-logo {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--mbide-brand);
+}
+
+.mbide-btn {
+  background: var(--mbide-bg);
+  color: var(--mbide-text);
+  border: 1px solid var(--mbide-border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mbide-btn:hover { border-color: var(--mbide-brand); }
+.mbide-btn.primary { background: var(--mbide-brand); color: #fff; border-color: var(--mbide-brand); font-weight: 600; }
+.mbide-btn:focus-visible { outline: 2px solid var(--mbide-brand); outline-offset: 1px; }
+
+.mbide-spacer { flex: 1; }
+
+.mbide-main {
+  display: grid;
+  grid-template-columns: 220px 1fr 340px;
+  flex: 1;
+  min-height: 0;
+}
+@media (max-width: 1100px) {
+  .mbide-main { grid-template-columns: 1fr; grid-auto-rows: minmax(180px, auto); }
+  .mbide-panel { max-height: 40vh; overflow: auto; }
+}
+
+.mbide-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border-right: 1px solid var(--mbide-border); }
+.mbide-panel.dock { border-left: 1px solid var(--mbide-border); border-right: none; }
+
+.mbide-hd { padding: 6px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--mbide-muted); border-bottom: 1px solid var(--mbide-border); }
+
+.mbide-tree { overflow: auto; flex: 1; font-size: 12px; padding: 4px 0; }
+.mbide-tree button { display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--mbide-text); padding: 3px 10px; cursor: pointer; font-size: 12px; }
+.mbide-tree button:hover { background: rgba(88, 166, 255, .12); }
+
+.mbide-editor-col { display: flex; flex-direction: column; min-height: 0; }
+.mbide-editor-host { flex: 1; min-height: 0; }
+.mbide-status { display: flex; gap: 14px; padding: 3px 10px; font-size: 11px; color: var(--mbide-muted); border-top: 1px solid var(--mbide-border); }
+
+.mbide-log { flex: 1; overflow: auto; padding: 8px 10px; font-size: 12px; white-space: pre-wrap; font-family: ui-monospace, monospace; }
+.mbide-msg { border-left: 2px solid var(--mbide-border); padding: 4px 8px; margin-bottom: 6px; }
+.mbide-msg.user { border-color: var(--mbide-brand); }
+.mbide-msg.err { border-color: #e06c75; color: #e06c75; }
+.mbide-msg.media { padding: 6px 8px; }
+.mbide-media-cap { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-bottom: 4px; }
+.mbide-media { display: block; max-width: 100%; max-height: 320px; border-radius: 6px; background: #fff; }
+
+.mbide-prompt { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--mbide-border); }
+.mbide-prompt textarea { flex: 1; min-height: 44px; resize: vertical; background: var(--mbide-bg); color: var(--mbide-text); border: 1px solid var(--mbide-border); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
+
+.mbide-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 60; }
+.mbide-modal { background: var(--mbide-surface); border: 1px solid var(--mbide-border); border-radius: 12px; width: min(560px, 92vw); padding: 16px; color: var(--mbide-text); }
+.mbide-modal h2 { font-size: 15px; margin: 0 0 10px; }
+.mbide-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.mbide-row label { font-size: 11px; color: var(--mbide-muted); }
+.mbide-row input, .mbide-row select { background: var(--mbide-bg); color: var(--mbide-text); border: 1px solid var(--mbide-border); border-radius: 6px; padding: 7px 9px; font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mbide-root * { transition: none !important; }
+}
+
+/* ---- MONOCODE Composer: diff ya faili nyingi (Cursor/Devin) ---- */
+.mbide-composer { width: min(720px, 94vw); max-height: 88vh; display: flex; flex-direction: column; }
+.mbide-composer-list { overflow: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.mbide-composer-card { border: 1px solid var(--mbide-border); border-radius: 8px; overflow: hidden; background: var(--mbide-bg); }
+.mbide-diffbox { max-height: 220px; overflow: auto; font-family: ui-monospace, monospace; font-size: 11.5px; line-height: 1.45; }
+.mbide-diffline { white-space: pre; padding: 0 8px; }
+.mbide-diffline.add { background: rgba(70, 160, 90, .18); color: #9ae6a8; }
+.mbide-diffline.del { background: rgba(200, 70, 70, .18); color: #e89a9a; }
+.mbide-diffline.hunk { background: rgba(120, 140, 200, .15); color: #b8c2e8; }
+.mbide-diffline.ctx { color: var(--mbide-muted); }

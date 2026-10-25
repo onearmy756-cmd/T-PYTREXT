@@ -1,0 +1,1 @@
+function e(e,t){let n=t?`?org=${encodeURIComponent(t)}`:``;return`${e.host.replace(/\/+$/,``)}/settings/integrations${n}`}export{e as t};

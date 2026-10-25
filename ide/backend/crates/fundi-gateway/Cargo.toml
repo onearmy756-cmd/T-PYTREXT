@@ -1,0 +1,61 @@
+[package]
+name = "fundi-gateway"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Message gateway and platform adapters for Fundi Agent"
+
+[features]
+default = []
+telegram = []
+discord = []
+slack = []
+whatsapp = []
+signal = []
+matrix = []
+mattermost = []
+dingtalk = []
+feishu = []
+wecom = []
+wecom-callback = ["dep:aes"]
+weixin = ["dep:aes", "dep:rand"]
+qqbot = []
+bluebubbles = []
+email = []
+sms = []
+homeassistant = []
+api-server = []
+webhook = []
+
+[dependencies]
+fundi-core = { workspace = true }
+fundi-config = { workspace = true }
+fundi-tools = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+reqwest = { workspace = true, features = ["multipart"] }
+tokio-tungstenite = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+url = { workspace = true }
+futures = { workspace = true }
+regex = { workspace = true }
+urlencoding = "2"
+md5 = "0.8"
+rustls = { version = "0.23", default-features = false, features = ["ring", "logging", "std", "tls12"] }
+webpki-roots = "0.26"
+hmac = "0.12"
+sha1 = "0.10"
+base64 = { workspace = true }
+aes = { version = "0.9", optional = true }
+rand = { version = "0.8", optional = true }
+
+[dev-dependencies]
+tempfile = "3"
+proptest = { workspace = true }
+wiremock = "0.6"

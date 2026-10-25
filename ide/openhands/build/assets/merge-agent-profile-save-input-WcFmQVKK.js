@@ -1,0 +1,1 @@
+function e(e,t){if(!e||e.agent_kind!==t.agent_kind)return t;let{id:n,name:r,revision:i,...a}=e;return{...a,...t}}export{e as t};

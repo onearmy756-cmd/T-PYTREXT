@@ -1,0 +1,22 @@
+{
+  "name": "jira-issue-to-pr",
+  "version": "1.0.0",
+  "description": "Deploy a cron-based OpenHands automation that opens a GitHub pull request, a GitLab merge request or a Bitbucket pull request for each Jira issue carrying a configurable label (default: create-pr). The target repository is read from the ticket body - no repo parameter required at deploy time.",
+  "author": {
+    "name": "OpenHands",
+    "email": "contact@all-hands.dev"
+  },
+  "homepage": "https://github.com/OpenHands/extensions",
+  "repository": "https://github.com/OpenHands/extensions",
+  "license": "MIT",
+  "keywords": [
+    "jira",
+    "atlassian",
+    "github",
+    "gitlab",
+    "bitbucket",
+    "pull-request",
+    "merge-request",
+    "automation"
+  ]
+}

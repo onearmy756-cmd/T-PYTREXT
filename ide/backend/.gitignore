@@ -1,0 +1,31 @@
+/target
+# 第三方参考仓库通常放在上级目录 ~/workspace/research/GEO-AI
+GEO-AI/
+**/node_modules/
+**/*.rs.bk
+*.pdb
+.DS_Store
+.env
+.env.cloud.local
+.env.local
+*.log
+vout-endianness-analysis.md
+
+dist
+.fundi/
+.playwright-mcp/
+# 团队默认可提交 `.vscode/settings.json`；其余仍忽略
+.vscode/*
+!.vscode/settings.json
+
+
+deploy
+.kiro
+.vscode
+
+refs
+
+# Local artifacts for web/mobile app dev
+apps/mobile-app/.expo/
+apps/mobile-app/.metadata
+apps/web-app/.env.local

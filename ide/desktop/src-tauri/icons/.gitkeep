@@ -1,0 +1,3 @@
+# Run from ide-tauri:
+#   npx tauri icon path/to/your-1024.png
+# This generates 32x32.png, 128x128.png, icon.icns, icon.ico, etc.

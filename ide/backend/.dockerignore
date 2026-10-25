@@ -1,0 +1,9 @@
+target/
+.git/
+*.md
+!README.md
+.github/
+.kiro/
+scripts/
+**/node_modules/
+ 

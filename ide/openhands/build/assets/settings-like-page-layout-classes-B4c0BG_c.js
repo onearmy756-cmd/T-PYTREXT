@@ -1,0 +1,1 @@
+var e=`flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] custom-scrollbar-always px-4 pt-8 pb-12 lg:px-0 lg:pr-3.5`,t=`flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] custom-scrollbar-always px-4 pt-8 pb-12 lg:px-0 lg:pt-0 lg:pr-3.5`;export{e as n,t};

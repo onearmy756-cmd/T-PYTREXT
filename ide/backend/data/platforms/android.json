@@ -1,0 +1,246 @@
+{
+  "title": "Android",
+  "shell": "sh",
+  "categories": [
+    {
+      "id": "recon",
+      "title": "Device",
+      "commands": [
+        {
+          "name": "adb devices",
+          "usage": "adb devices -l",
+          "desc": "List attached devices",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb getprop",
+          "usage": "adb shell getprop",
+          "desc": "Read all system properties",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb pm list packages",
+          "usage": "adb shell pm list packages -f",
+          "desc": "List installed packages",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb dumpsys",
+          "usage": "adb shell dumpsys",
+          "desc": "Dump system service state",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb ps",
+          "usage": "adb shell ps -A",
+          "desc": "List running processes",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb netstat",
+          "usage": "adb shell netstat -tunlp",
+          "desc": "Network sockets on the device",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb ip",
+          "usage": "adb shell ip addr",
+          "desc": "Interface addresses",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb settings get",
+          "usage": "adb shell settings get global airplane_mode_on",
+          "desc": "Read a settings value",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb wm size",
+          "usage": "adb shell wm size",
+          "desc": "Screen resolution",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb content query",
+          "usage": "adb shell content query --uri content://settings/secure",
+          "desc": "Query a content provider",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb shell id",
+          "usage": "adb shell id",
+          "desc": "Current shell user and groups",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "dfir",
+      "title": "Forensics",
+      "commands": [
+        {
+          "name": "adb logcat",
+          "usage": "adb logcat -d -v threadtime",
+          "desc": "Dump the system log",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb pull",
+          "usage": "adb pull /sdcard/DCIM ./evidence",
+          "desc": "Pull files from the device",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb dumpsys activity",
+          "usage": "adb shell dumpsys activity activities",
+          "desc": "Recent activity state",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb dumpsys package",
+          "usage": "adb shell dumpsys package com.example.app",
+          "desc": "Package details and permissions",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb dumpsys battery",
+          "usage": "adb shell dumpsys battery",
+          "desc": "Battery and charging state",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb backup",
+          "usage": "adb backup -apk -shared -all -f backup.ab",
+          "desc": "Full device backup",
+          "target": "device",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "adb proc",
+          "usage": "adb shell cat /proc/version",
+          "desc": "Kernel version",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb tmp",
+          "usage": "adb shell ls -la /data/local/tmp",
+          "desc": "Inspect the temp directory",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "Audit",
+      "commands": [
+        {
+          "name": "adb dumpsys permissions",
+          "usage": "adb shell dumpsys package permissions",
+          "desc": "Permission grants",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb pm permissions",
+          "usage": "adb shell pm list permissions -g",
+          "desc": "Permission groups",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb security patch",
+          "usage": "adb shell getprop ro.build.version.security_patch",
+          "desc": "Security patch level",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "adb dumpsys device_policy",
+          "usage": "adb shell dumpsys device_policy",
+          "desc": "Device-admin policies",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "commands": [
+        {
+          "name": "adb settings put",
+          "usage": "adb shell settings put global development_settings_enabled 0",
+          "desc": "Disable developer options",
+          "target": "device",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "adb pm disable",
+          "usage": "adb shell pm disable-user --user 0 com.example.app",
+          "desc": "Disable a package",
+          "target": "device",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "adb device_policy",
+          "usage": "adb shell cmd device_policy",
+          "desc": "Manage device policy",
+          "target": "device",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "adb selinux",
+          "usage": "adb shell getenforce",
+          "desc": "SELinux enforcement mode",
+          "target": "device",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    }
+  ]
+}

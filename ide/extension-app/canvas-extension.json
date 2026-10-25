@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "name": "mbilinyitech-ide",
+  "display_name": "MBILINYITECH IDE",
+  "version": "0.1.0",
+  "description": "MTECHOS IDE inside Agent Canvas: Monaco editor, Autopilot, coding agent, providers, AKILI, swarm and terminal.",
+  "entrypoint": "extension.js",
+  "contributes": {
+    "pages": [
+      {
+        "id": "ide",
+        "title": "MBILINYITECH IDE",
+        "path": "/mbilinyitech-ide",
+        "nav_label": "MBILINYITECH IDE",
+        "description": "Code, run the Autopilot and drive the MTECHOS agent.",
+        "hidden": true
+      }
+    ]
+  }
+}

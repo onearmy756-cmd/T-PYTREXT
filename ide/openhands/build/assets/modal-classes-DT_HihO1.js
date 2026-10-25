@@ -1,0 +1,1 @@
+import{t as e}from"./utils-tjTScIp3.js";var t=e(`text-xl leading-6 -tracking-[0.01em] font-medium text-modal-title`),n=e(`text-sm font-medium text-modal-title`),r=e(`text-lg font-medium text-modal-title`),i=r;export{n as i,r as n,i as r,t};

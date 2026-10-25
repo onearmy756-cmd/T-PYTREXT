@@ -1,0 +1,352 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+:root {
+  --oh-bg-dark: var(--cool-grey-950);
+  --oh-bg-light: var(--cool-grey-900);
+  --oh-bg-input: var(--cool-grey-800);
+  --oh-bg-workspace: var(--cool-grey-925);
+  --oh-text-editor-base: var(--cool-grey-400);
+  --oh-text-editor-active: var(--cool-grey-300);
+  --oh-bg-editor-sidebar: var(--cool-grey-925);
+  --oh-bg-editor-active: var(--cool-grey-900);
+  --oh-border-editor-sidebar: var(--cool-grey-800);
+  --oh-bg-neutral-muted: color-mix(in srgb, var(--cool-grey-300) 20%, transparent);
+  --bg-dark: var(--oh-bg-dark);
+  --bg-light: var(--oh-bg-light);
+  --bg-input: var(--oh-bg-input);
+  --bg-workspace: var(--oh-bg-workspace);
+  --text-editor-base: var(--oh-text-editor-base);
+  --text-editor-active: var(--oh-text-editor-active);
+  --bg-editor-sidebar: var(--oh-bg-editor-sidebar);
+  --bg-editor-active: var(--oh-bg-editor-active);
+  --border-editor-sidebar: var(--oh-border-editor-sidebar);
+  --bg-neutral-muted: var(--oh-bg-neutral-muted);
+  background-color: var(--oh-color-base) !important;
+
+  /* ── Obsidian Ember Scale — kaboni yenye joto la ember ──────────────── */
+  --cool-grey-50:  #FFF3EA;
+  --cool-grey-100: #FFE4D2;
+  --cool-grey-200: #FFC7A6;
+  --cool-grey-300: #F7A472;
+  --cool-grey-400: #E07E45;
+  --cool-grey-500: #B85C2C;
+  --cool-grey-600: #8F4520;
+  --cool-grey-700: #69331A;
+  --cool-grey-800: #472415;
+  --cool-grey-900: #29150E;
+  --cool-grey-925: #1E0F0A;
+  --cool-grey-950: #130A07; /* obsidian ember night */
+  --cool-grey-975: #0A0503;
+  /* ─────────────────────────────────────────────────────────────────────── */
+}
+
+body {
+  margin: 0;
+  background-color: var(--oh-color-base);
+  background-image:
+    radial-gradient(
+      1200px 620px at 82% -8%,
+      rgba(255, 107, 44, 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      880px 520px at 8% 108%,
+      rgba(56, 189, 248, 0.08),
+      transparent 60%
+    );
+  background-attachment: fixed;
+  font-family:
+    "IBM Plex Sans", "SF Pro", BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.markdown-body code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  white-space: break-spaces;
+  background-color: var(--cool-grey-900);
+  border-radius: 4px;
+  color: var(--cool-grey-100);
+  border: 1px solid var(--cool-grey-900);
+  letter-spacing: -0.2px;
+}
+
+.markdown-body pre code {
+  padding: 0;
+  background-color: inherit;
+}
+
+.markdown-body {
+  white-space: pre-wrap; /* Handles line breaks */
+}
+
+.markdown-body th {
+  text-align: left;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 0.1rem 1rem;
+}
+
+/* Fast smooth scrolling for chat interface */
+.fast-smooth-scroll {
+  scroll-behavior: smooth;
+  scroll-timeline: 100ms;
+}
+
+@keyframes environment-switch-content-refresh {
+  0% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+:host[data-environment-switching="true"] [data-testid="root-layout"] {
+  animation: environment-switch-content-refresh 980ms ease-in-out forwards;
+}
+
+@keyframes environment-switch-overlay-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+.environment-switch-overlay > div {
+  animation: environment-switch-overlay-fade 980ms ease-in-out forwards;
+}
+
+/* ── MBILINYI boot splash — "ember ignition" ─────────────────────────────
+   The IDE opens on a warm obsidian field with a single breathing ember ring
+   and the wordmark rising into place. Deliberately unlike a plain spinner. */
+@keyframes mb-boot-ring {
+  0% {
+    transform: rotate(0deg) scale(0.86);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes mb-boot-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+@keyframes mb-boot-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    letter-spacing: 0.5em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    letter-spacing: 0.22em;
+  }
+}
+@keyframes mb-boot-sheen {
+  from {
+    background-position: -140% 0;
+  }
+  to {
+    background-position: 240% 0;
+  }
+}
+
+.mb-boot {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      640px 420px at 50% 42%,
+      rgba(255, 107, 44, 0.16),
+      transparent 68%
+    ),
+    radial-gradient(
+      520px 380px at 78% 88%,
+      rgba(56, 189, 248, 0.07),
+      transparent 62%
+    ),
+    var(--oh-color-base);
+  z-index: 50;
+}
+.mb-boot-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 148px;
+  height: 148px;
+}
+.mb-boot-ring,
+.mb-boot-ring::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  content: "";
+}
+.mb-boot-ring {
+  border: 1.5px solid transparent;
+  border-top-color: #ff6b2c;
+  border-right-color: rgba(255, 107, 44, 0.35);
+  animation: mb-boot-ring 1.4s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+}
+.mb-boot-ring::after {
+  inset: 13px;
+  border: 1.5px solid transparent;
+  border-bottom-color: #38bdf8;
+  border-left-color: rgba(56, 189, 248, 0.3);
+  animation: mb-boot-ring 2.1s cubic-bezier(0.5, 0, 0.2, 1) infinite reverse;
+}
+.mb-boot-core {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: linear-gradient(140deg, #ff6b2c 0%, #b85c2c 55%, #29150e 100%);
+  box-shadow:
+    0 0 34px rgba(255, 107, 44, 0.5),
+    inset 0 0 18px rgba(255, 228, 210, 0.25);
+  animation: mb-boot-breathe 2.2s ease-in-out infinite;
+}
+.mb-boot-word {
+  margin-top: 26px;
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #ffe4d2;
+  animation: mb-boot-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.mb-boot-sub {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: #b85c2c;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    90deg,
+    #b85c2c 0%,
+    #ffe4d2 45%,
+    #b85c2c 90%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: mb-boot-sheen 2.6s linear infinite;
+}
+.mb-boot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mb-boot-ring,
+  .mb-boot-ring::after,
+  .mb-boot-core,
+  .mb-boot-word,
+  .mb-boot-sub {
+    animation-duration: 0.001ms;
+    animation-iteration-count: 1;
+  }
+}
+
+/* ── MBILINYI home "forge" hero ──────────────────────────────────────── */
+.mb-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #e07e45;
+}
+.mb-hero-kicker::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: #ff6b2c;
+  box-shadow: 0 0 10px rgba(255, 107, 44, 0.75);
+}
+.mb-hero-title {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(96deg, #ffe4d2 0%, #f7a472 52%, #e07e45 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.mb-hero-rule {
+  height: 3px;
+  width: 76px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ff6b2c 0%, rgba(255, 107, 44, 0) 100%);
+}
+
+/* ===== Kadi za 3D (MTECHOS) — huinuka kwa mwendo wa kursa ===== */
+.mtechos-3d-scene {
+  perspective: 900px;
+}
+.mtechos-3d-card {
+  transform: rotateX(var(--c3d-rx, 0deg)) rotateY(var(--c3d-ry, 0deg))
+    translateZ(var(--c3d-tz, 0px));
+  transform-style: preserve-3d;
+  transition: transform 140ms ease-out, box-shadow 140ms ease-out;
+  will-change: transform;
+}
+.mtechos-3d-card:hover,
+.mtechos-3d-card:focus-visible {
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mtechos-3d-card {
+    transition: none;
+    transform: none;
+  }
+}

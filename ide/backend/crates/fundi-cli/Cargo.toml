@@ -1,0 +1,81 @@
+[package]
+name = "fundi-cli"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "CLI/TUI interface for Fundi Agent"
+
+[features]
+default = []
+otlp = ["fundi-telemetry/otlp"]
+
+[[bin]]
+name = "fundi"
+path = "src/main.rs"
+
+[dependencies]
+fundi-core = { workspace = true }
+fundi-agent = { workspace = true }
+fundi-tools = { workspace = true }
+fundi-config = { workspace = true }
+fundi-server = { workspace = true }
+fundi-gateway = { workspace = true, features = [
+    "telegram",
+    "discord",
+    "slack",
+    "whatsapp",
+    "signal",
+    "matrix",
+    "mattermost",
+    "dingtalk",
+    "feishu",
+    "wecom",
+    "wecom-callback",
+    "weixin",
+    "qqbot",
+    "bluebubbles",
+    "email",
+    "sms",
+    "homeassistant",
+    "api-server",
+    "webhook",
+] }
+fundi-cron = { workspace = true }
+fundi-environments = { workspace = true }
+fundi-mcp = { workspace = true }
+fundi-acp = { workspace = true }
+fundi-skills = { workspace = true }
+fundi-telemetry = { workspace = true }
+clap = { workspace = true }
+clap_complete = "4"
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+dirs = "6"
+reqwest = { workspace = true, features = ["blocking"] }
+flate2 = "1"
+tar = "0.4"
+serde_yaml = "0.9"
+regex = { workspace = true }
+urlencoding = "2"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"
+assert_cmd = "2"
+wiremock = "0.6"
+chrono = { workspace = true }
+fundi-core = { workspace = true }
+fundi-cron = { workspace = true }

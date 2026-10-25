@@ -1,0 +1,1 @@
+import{t as e}from"./useMutation-CE6Sy9qG.js";import{t}from"./secrets-service-BRWijK1c.js";var n=()=>e({mutationFn:({name:e,value:n,description:r})=>t.createSecret(e,n,r)});export{n as t};

@@ -1,0 +1,147 @@
+#![allow(
+    clippy::field_reassign_with_default,
+    clippy::if_same_then_else,
+    clippy::should_implement_trait,
+    clippy::too_many_arguments,
+    dead_code
+)]
+//! # fundi-gateway
+//!
+//! Message gateway and platform adapters for the Fundi Agent system.
+//!
+//! This crate implements the message gateway system (Requirement 7), providing:
+//! - A unified `Gateway` orchestrator for all platform adapters
+//! - Session management with configurable reset policies
+//! - Streaming output management for progressive message updates
+//! - Media caching for images, audio, and documents
+//! - SSRF protection for outbound URL validation
+//! - DM pairing mechanism for unauthorized user handling
+//! - Platform-specific adapters behind feature flags
+
+pub mod adapter;
+pub mod background;
+pub mod channel_directory;
+pub mod commands;
+pub mod delivery;
+pub mod dm;
+pub mod format;
+pub mod gateway;
+pub mod gateway_requirements;
+pub mod hook_payloads;
+pub mod hooks;
+pub mod markdown_split;
+pub mod media;
+pub mod mirror;
+pub mod pairing;
+pub mod platform_registry;
+pub mod platform_requirements;
+pub mod platforms;
+pub mod session;
+pub mod ssrf;
+pub mod sticker_cache;
+pub mod stream;
+pub mod tool_backends;
+pub mod voice;
+
+// Re-export core types from fundi-core
+pub use fundi_core::errors::GatewayError;
+pub use fundi_core::traits::{ParseMode, PlatformAdapter};
+pub use fundi_core::types::Message;
+
+// Re-export gateway orchestrator and runtime context
+pub use gateway::{Gateway, GatewayRuntimeContext};
+
+// Re-export platform registry
+pub use gateway_requirements::gateway_requirement_issues;
+pub use platform_registry::{register_platforms, RegistrationSummary};
+pub use platform_requirements::{
+    evaluate_gateway_requirements, RequirementIssue, RequirementScope, RequirementSeverity,
+};
+
+// Re-export session management
+pub use session::{Session, SessionManager};
+
+// Slash commands (built-in + [`register_slash_command_extension`])
+pub use commands::{
+    all_commands, handle_command, register_slash_command_extension, ExtensionCommandInfo,
+    SlashCommandExtension,
+};
+
+// Re-export stream management
+pub use stream::{StreamHandle, StreamManager};
+
+// Re-export media caching
+pub use media::MediaCache;
+
+// Re-export SSRF protection
+pub use ssrf::{is_safe_url, validate_url};
+
+// Re-export DM management
+pub use channel_directory::{ChannelDirectory, ChannelEntry};
+pub use delivery::{parse_target, DeliveryItem, DeliveryQueue, DeliveryRouter, DeliveryTarget};
+pub use dm::{DmDecision, DmManager};
+pub use mirror::MirrorManager;
+pub use pairing::{PairingManager, PairingState};
+pub use sticker_cache::{StickerCache, StickerMeta};
+
+// Re-export adapter base
+pub use adapter::BasePlatformAdapter;
+
+// Re-export platform adapters behind feature flags
+
+#[cfg(feature = "telegram")]
+pub use platforms::telegram::TelegramAdapter;
+
+#[cfg(feature = "discord")]
+pub use platforms::discord::DiscordAdapter;
+
+#[cfg(feature = "slack")]
+pub use platforms::slack::SlackAdapter;
+
+#[cfg(feature = "whatsapp")]
+pub use platforms::whatsapp::WhatsAppAdapter;
+
+#[cfg(feature = "signal")]
+pub use platforms::signal::SignalAdapter;
+
+#[cfg(feature = "matrix")]
+pub use platforms::matrix::MatrixAdapter;
+
+#[cfg(feature = "mattermost")]
+pub use platforms::mattermost::MattermostAdapter;
+
+#[cfg(feature = "dingtalk")]
+pub use platforms::dingtalk::DingTalkAdapter;
+
+#[cfg(feature = "feishu")]
+pub use platforms::feishu::FeishuAdapter;
+
+#[cfg(feature = "wecom")]
+pub use platforms::wecom::WeComAdapter;
+
+#[cfg(feature = "wecom-callback")]
+pub use platforms::wecom_callback::WeComCallbackAdapter;
+
+#[cfg(feature = "weixin")]
+pub use platforms::weixin::WeChatAdapter;
+
+#[cfg(feature = "qqbot")]
+pub use platforms::qqbot::QqBotAdapter;
+
+#[cfg(feature = "bluebubbles")]
+pub use platforms::bluebubbles::BlueBubblesAdapter;
+
+#[cfg(feature = "email")]
+pub use platforms::email::EmailAdapter;
+
+#[cfg(feature = "sms")]
+pub use platforms::sms::SmsAdapter;
+
+#[cfg(feature = "homeassistant")]
+pub use platforms::homeassistant::HomeAssistantAdapter;
+
+#[cfg(feature = "api-server")]
+pub use platforms::api_server::ApiServerAdapter;
+
+#[cfg(feature = "webhook")]
+pub use platforms::webhook::WebhookAdapter;

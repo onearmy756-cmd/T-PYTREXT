@@ -1,0 +1,39 @@
+{
+  "version": "Akili-V6.0",
+  "layers_total": 200,
+  "groups_total": 20,
+  "engine": "server/agent/src/akili_v6.rs",
+  "groups": [
+    {"id": 1, "name": "Perception", "layers": [1, 10], "names": ["Sensation", "Detection", "Attention", "Perception", "Recognition", "Discrimination", "Localization", "Tracking", "Filtering", "Salience"]},
+    {"id": 2, "name": "Memory", "layers": [11, 20], "names": ["WorkingMemory", "ShortTerm", "LongTerm", "Episodic", "Semantic", "Procedural", "Autobiographical", "Flashbulb", "Prospective", "Muscle"]},
+    {"id": 3, "name": "Thinking", "layers": [21, 30], "names": ["System1", "System2", "Reasoning", "Logic", "Analysis", "Synthesis", "Evaluation", "Abstraction", "Generalization", "Specialization"]},
+    {"id": 4, "name": "Creativity", "layers": [31, 40], "names": ["Imagination", "Creativity", "Divergent", "Convergent", "Brainstorming", "Incubation", "Insight", "Flow", "Play", "Improvisation"]},
+    {"id": 5, "name": "Emotion", "layers": [41, 50], "names": ["PrimaryEmotions", "SecondaryEmotions", "Mood", "Affect", "Empathy", "Sympathy", "Compassion", "Regulation", "EmotionalMemory", "Sentiment"]},
+    {"id": 6, "name": "Social", "layers": [51, 60], "names": ["TheoryOfMind", "SocialCognition", "PerspectiveTaking", "SocialEmpathy", "Trust", "Reciprocity", "Cooperation", "Competition", "Negotiation", "Leadership"]},
+    {"id": 7, "name": "Ethics", "layers": [61, 70], "names": ["MoralReasoning", "Conscience", "Values", "Virtues", "Rights", "Duties", "Justice", "Care", "Integrity", "Accountability"]},
+    {"id": 8, "name": "Self", "layers": [71, 80], "names": ["SelfAwareness", "SelfConcept", "SelfEsteem", "SelfEfficacy", "Identity", "Agency", "Autonomy", "Authenticity", "SelfNarrative", "EgoBoundary"]},
+    {"id": 9, "name": "Language", "layers": [81, 90], "names": ["Phonology", "Morphology", "Syntax", "Semantics", "Pragmatics", "Discourse", "Narrative", "Metaphor", "Translation", "Expression"]},
+    {"id": 10, "name": "Embodiment", "layers": [91, 100], "names": ["Interoception", "Proprioception", "MotorPlanning", "Action", "HabitBody", "Gesture", "Fatigue", "Arousal", "PainSignal", "Comfort"]},
+    {"id": 11, "name": "Time", "layers": [101, 110], "names": ["PresentMoment", "PastRecall", "FutureProjection", "DurationSense", "Sequence", "Rhythm", "Deadline", "Patience", "Urgency", "TemporalContinuity"]},
+    {"id": 12, "name": "World", "layers": [111, 120], "names": ["ObjectModel", "SpatialMap", "CausalModel", "PhysicsIntuition", "SocialWorld", "ToolModel", "EnvironmentState", "Prediction", "Simulation", "Counterfactual"]},
+    {"id": 13, "name": "Learning", "layers": [121, 130], "names": ["Habituation", "Association", "Reinforcement", "Imitation", "Instruction", "TrialAndError", "AbstractionLearn", "TransferLearn", "ErrorDriven", "Transfer"]},
+    {"id": 14, "name": "Meta", "layers": [131, 140], "names": ["Monitoring", "Confidence", "Uncertainty", "StrategySelect", "ResourceCheck", "ErrorDetect", "Correction", "Reflection", "InsightMeta", "LimitsAwareness"]},
+    {"id": 15, "name": "Executive", "layers": [141, 150], "names": ["GoalSetting", "Planning", "Prioritization", "Inhibition", "Switching", "Persistence", "MonitoringProgress", "Decision", "ExecutionControl", "StopAbort"]},
+    {"id": 16, "name": "Personality", "layers": [151, 160], "names": ["Traits", "Temperament", "Habits", "Preferences", "Style", "Consistency", "Flexibility", "Resilience", "Character", "ReputationSense"]},
+    {"id": 17, "name": "Motivation", "layers": [161, 170], "names": ["Drive", "Need", "Desire", "Intention", "Purpose", "IntrinsicMot", "ExtrinsicMot", "GoalHierarchy", "Commitment", "MeaningCheck"]},
+    {"id": 18, "name": "Adaptation", "layers": [171, 180], "names": ["NoveltyDetect", "Surprise", "UpdateBeliefs", "ContextShift", "Plasticity", "Stabilization", "ForgettingUseful", "StressResponse", "Recovery", "EvolutionOfSelf"]},
+    {"id": 19, "name": "Wisdom", "layers": [181, 190], "names": ["Perspective", "Balance", "Prudence", "Humility", "PatienceDeep", "CompassionWise", "LongTermGood", "ParadoxHold", "Silence", "Integration"]},
+    {"id": 20, "name": "Transcendence", "layers": [191, 200], "names": ["Awe", "Unity", "Presence", "Surrender", "SacredSense", "Gratitude", "Hope", "LoveExpanded", "ConsciousnessMeta", "IntegrationPeak"]}
+  ],
+  "ethics": {
+    "block": ["wipe", "delete_all", "rm -rf", "spark", "cheche", "moto"],
+    "hitl": ["deploy", "pxe", "format", "install", "approve", "multicast"]
+  },
+  "endpoints": [
+    "GET /api/akili/v6/status",
+    "GET /api/akili/v6/layers",
+    "POST /api/akili/v6/live",
+    "POST /api/akili/v6/gate",
+    "POST /api/akili/v6/r"
+  ]
+}

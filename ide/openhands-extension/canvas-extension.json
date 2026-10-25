@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "mtechos-ide",
+  "display_name": "MTECHOS IDE",
+  "version": "1.0.0",
+  "description": "MTECHOS FORGE — zalisha mradi mzima (blueprint → faili nyingi kwa parallel → lint → usalama → engineer) + Ollama booster kwa Agent Canvas.",
+  "entrypoint": "extension.js",
+  "contributes": {
+    "pages": [
+      {
+        "id": "studio",
+        "title": "MTECHOS IDE",
+        "path": "/studio",
+        "nav_label": "MTECHOS IDE",
+        "hidden": true
+      },
+      {
+        "id": "editor",
+        "title": "Monaco Editor",
+        "path": "/editor",
+        "nav_label": "Monaco Editor",
+        "hidden": true
+      },
+      {
+        "id": "mtechos-ide",
+        "title": "MTECHOS IDE",
+        "path": "/mtechos",
+        "nav_label": "MTECHOS IDE",
+        "hidden": true
+      },
+      {
+        "id": "ollama",
+        "title": "Ollama Booster",
+        "path": "/ollama",
+        "nav_label": "Ollama → MBILINYI",
+        "hidden": true
+      },
+      {
+        "id": "super",
+        "title": "Super Engineer",
+        "path": "/super",
+        "nav_label": "Super Engineer",
+        "hidden": true
+      },
+      {
+        "id": "sdlc",
+        "title": "SDLC",
+        "path": "/sdlc",
+        "nav_label": "SDLC Lifecycle",
+        "hidden": true
+      }
+    ]
+  }
+}

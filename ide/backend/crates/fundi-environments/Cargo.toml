@@ -1,0 +1,31 @@
+[package]
+name = "fundi-environments"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Terminal backends and environment management for Fundi Agent"
+
+[features]
+default = []
+docker = []
+ssh = []
+daytona = []
+modal = []
+singularity = []
+
+[dependencies]
+fundi-core = { workspace = true }
+fundi-config = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+reqwest = { workspace = true }
+chrono = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+fundi-config = { workspace = true, features = ["test-helpers"] }

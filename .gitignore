@@ -45,3 +45,14 @@ venv/
 # Generated
 /gen/
 *.whl
+
+# === MBILINYI IDE (ide/) ===
+# node_modules ni kubwa (1.1G) — hujengwa kwa `npm ci`
+ide/**/node_modules/
+ide/**/dist/
+ide/**/.vite/
+ide/**/target/
+ide/backend/fundi-server.log
+# Canvas build LAZIMA iingizwe (hudumiwa kwenye /ide)
+!ide/openhands/build/
+!ide/openhands/build/**

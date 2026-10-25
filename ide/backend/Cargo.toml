@@ -1,0 +1,149 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fundi-transport",
+    "crates/fundi-core",
+    "crates/fundi-agent",
+    "crates/fundi-tools",
+    "crates/fundi-gateway",
+    "crates/fundi-cli",
+    "crates/fundi-cron",
+    "crates/fundi-skills",
+    "crates/fundi-mcp",
+    "crates/fundi-environments",
+    "crates/fundi-config",
+    "crates/fundi-intelligence",
+    "crates/fundi-acp",
+    "crates/fundi-eval",
+    "crates/fundi-server",
+    "crates/fundi-telemetry",
+    "crates/fundi-parity-tests",
+    "crates/fundi-bus",
+    "crates/fundi-engine",
+]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+license = "GPL-3.0"
+repository = "https://github.com/onearmy756-cmd/MTECHOS"
+
+[workspace.dependencies]
+# Internal crates
+fundi-core = { path = "crates/fundi-core" }
+fundi-transport = { path = "crates/fundi-transport" }
+fundi-agent = { path = "crates/fundi-agent" }
+fundi-tools = { path = "crates/fundi-tools" }
+fundi-gateway = { path = "crates/fundi-gateway" }
+fundi-cli = { path = "crates/fundi-cli" }
+fundi-cron = { path = "crates/fundi-cron" }
+fundi-skills = { path = "crates/fundi-skills" }
+fundi-mcp = { path = "crates/fundi-mcp" }
+fundi-environments = { path = "crates/fundi-environments" }
+fundi-config = { path = "crates/fundi-config" }
+fundi-intelligence = { path = "crates/fundi-intelligence" }
+fundi-acp = { path = "crates/fundi-acp" }
+fundi-eval = { path = "crates/fundi-eval" }
+fundi-server = { path = "crates/fundi-server" }
+fundi-telemetry = { path = "crates/fundi-telemetry" }
+fundi-parity-tests = { path = "crates/fundi-parity-tests" }
+fundi-bus = { path = "crates/fundi-bus" }
+fundi-engine = { path = "crates/fundi-engine" }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+
+# HTTP / networking
+reqwest = { version = "0.12", default-features = false, features = ["stream", "json", "rustls-tls"] }
+tokio-tungstenite = "0.24"
+eventsource-stream = "0.2"
+
+# Error handling & logging
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# CLI & TUI
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.29"
+crossterm = "0.28"
+
+# Database
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+cron = "0.15"
+
+# Utils
+regex = "1"
+async-trait = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+base64 = "0.22"
+bytes = "1"
+# DOCX ni ZIP: tunachambua `word/document.xml` wenyewe (deflate).
+url = "2"
+directories = "6"
+minijinja = "3"
+jsonwebtoken = "9"
+indexmap = { version = "2", features = ["serde"] }
+once_cell = "1"
+proptest = "1"
+
+# ---------------------------------------------------------------------------
+# API ya msimamizi / agent ya fundi-deploy (hii ndiyo package ya binary kuu)
+# ---------------------------------------------------------------------------
+[package]
+name = "fundi-deploy"
+version = "1.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.36", features = ["full"] }
+axum = { version = "0.7", features = ["ws"] }
+tower-http = { version = "0.5", features = ["cors", "fs", "compression-gzip"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
+# Bundled: SQLite hujengwa kutoka chanzo (hakuna libsqlite3 ya mfumo hitaji kwenye Docker;
+# sqlx 0.8 haionyeshi bundled yenyewe kama sqlx 0.7 ilivyofanya).
+libsqlite3-sys = { version = "0.30", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["stream", "json", "rustls-tls"], optional = false }
+anyhow = "1.0"
+thiserror = { workspace = true }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+uuid = { version = "1.7", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+regex = "1"
+async-trait = "0.1"
+tokio-stream = "0.1"
+futures = { workspace = true }
+# Daraja la agent-server: WebSocket proxy ya /sockets/* (Canvas ↔ agent-server).
+tokio-tungstenite = { workspace = true }
+sha2 = "0.10"
+# Argon2id — password hashing (auth.rs); PHC string inajumuisha salt+params.
+argon2 = { version = "0.5", features = ["std"] }
+hmac = "0.12"
+base64 = "0.22"
+# DOCX ni ZIP: tunachambua `word/document.xml` wenyewe (deflate).
+flate2 = "1"
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+rand = "0.8"
+# E2EE halisi — ChaCha20-Poly1305 (AEAD) + HKDF-SHA256 kwa derivation ya key.
+# Hii ndiyo inayofanya "data haisomeki" kuwa KWELI, si ahadi pekee.
+chacha20poly1305 = { version = "0.10", features = ["std"] }
+hkdf = "0.12"
+# ECDSA P-256 (secp256r1) — muhuri wa kidijitali wa ripoti/mikataba na uthibitisho
+# wa kriptografia wa pande zote (PKI ya kampuni). NIST curve, RFC 6979 deterministic.
+p256 = { version = "0.13", features = ["ecdsa", "pem", "arithmetic"] }
+# FUNDI ENGINE — injini YETU ya inference (GGUF moja kwa moja, pure Rust)
+fundi-engine = { path = "crates/fundi-engine" }
+qrcode = { version = "0.14.1", default-features = false, features = ["svg"] }

@@ -1,0 +1,1 @@
+var e=function(e){return e.PENDING=`PENDING`,e.RUNNING=`RUNNING`,e.COMPLETED=`COMPLETED`,e.FAILED=`FAILED`,e.CANCELLED=`CANCELLED`,e.SKIPPED=`SKIPPED`,e}({});export{e as t};

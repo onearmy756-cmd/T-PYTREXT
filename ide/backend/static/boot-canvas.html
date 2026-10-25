@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<title>MBILINYI IDE — kuanza canvas…</title>
+<style>
+  body{background:#1a1f2b;color:#dce0e5;font:14px/1.6 system-ui;display:grid;place-items:center;height:100vh;margin:0}
+  .box{text-align:center}
+  .dot{width:10px;height:10px;border-radius:50%;background:#74ade8;display:inline-block;animation:p 1s infinite alternate}
+  @keyframes p{to{opacity:.3}}
+  code{color:#a9afbc;background:#282c33;padding:2px 6px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 style="font-size:18px;margin:0 0 8px">MBILINYI Agent Canvas <span class="dot"></span></h1>
+  <p id="msg" style="color:#a9afbc;margin:0">Inafungua canvas — tunaanza agent…</p>
+</div>
+<script>
+/* boot-canvas.html — Desktop (Tauri) huanza na canvas MOJA KWA MOJA,
+ * kama cloud IDE (uamuzi wa mmiliki: ide.html imetangazwa kufa).
+ * Mtiririko:
+ *   1) Tauri: invoke('get_api_base') → base (default http://127.0.0.1:8080)
+ *   2) Bonyeza /health hadi agent ipo (set_interval; start_agent_if_needed
+ *      amba uliza mwenzake lib.rs setup hubanza agent tayari kwa thread)
+ *   3) location.replace(base + '/ide') — canvas kwenda
+ *   4) Kama agent hufika ndani ya sekunde ~20 → hint halisi (si mock):
+ *      anzisha fundi-deploy au weka MTECHOS_API_BASE.
+ */
+(function () {
+  var msg = document.getElementById('msg');
+  var tries = 0;
+
+  function apiBase(cb) {
+    if (window.__TAURI_INTERNALS__ && window.__TAURI__) {
+      try {
+        var invoke = window.__TAURI__.core.invoke || (window.__TAURI__.tauri && window.__TAURI__.tauri.invoke);
+        invoke('get_api_base').then(function (i) { cb((i && i.base) || ''); }).catch(function () { cb(''); });
+        return;
+      } catch (e) { /* endelea — base '' (same-origin, dev) */ }
+    }
+    cb('');
+  }
+
+  function go(base) {
+    var url = (base && base.replace(/\/+$/, '')) + '/ide';
+    location.replace(url);
+  }
+
+  function waitAgent(base) {
+    var url = (base || '').replace(/\/+$/, '') + '/health';
+    fetch(url, { method: 'GET' }).then(function (r) {
+      if (r.ok) go(base);
+      else retry();
+    }).catch(retry);
+  }
+
+  function retry() {
+    tries++;
+    if (tries > 40) {
+      msg.innerHTML = 'Agent haijafika (sekunde 20+). Anzisha <code>fundi-deploy</code>' +
+        ' — au weka env <code>MTECHOS_API_BASE</code> — kisha fungua upya.';
+      return;
+    }
+    msg.textContent = 'Inasubiri agent (' + tries + '/40)…';
+    setTimeout(function () { boot(); }, 500);
+  }
+
+  function boot() {
+    apiBase(function (base) { waitAgent(base); });
+  }
+
+  window.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MBILINYITECH IDE - OpenHands Canvas App (live)</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b0e14;color:#e6e6e6;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  #banner{padding:8px 14px;background:#111827;border-bottom:1px solid #1f2937;
+    font-size:13px;color:#9ca3af}
+  #banner b{color:#22d3ee}
+  #host{height:calc(100% - 37px)}
+</style>
+</head>
+<body>
+<div id="banner">OpenHands Agent Canvas host shim (API 1) - app halisi: <b>extension.js</b>. Mock API ya MTECHOS kwenye origin hii.</div>
+<div id="host"></div>
+<script>window.__MTECHOS__ = { apiBase: location.origin };</script>
+<script type="module">
+  import { activate } from "/extension.js";
+  const host = {
+    apiVersion: "1",
+    extension: { name: "mbilinyitech-ide", version: "0.1.0", resolvedRef: "live" },
+    backend: { id: "preview", kind: "local", orgId: null },
+    registerPage(id, mount) { window.__mount = mount; window.__pageId = id; },
+    navigate(p) { location.hash = p; },
+    agentServer: { request: async (req) => {
+      const r = await fetch(req.path, { method: req.method || "GET",
+        headers: { "Content-Type": "application/json" },
+        body: req.body ? JSON.stringify(req.body) : undefined });
+      return r.json();
+    } },
+  };
+  window.__dispose = activate(host);
+  const mount = window.__mount;
+  if (mount) mount({ container: document.getElementById("host"), path: "/mbilinyitech-ide", navigate: () => {} });
+</script>
+</body>
+</html>

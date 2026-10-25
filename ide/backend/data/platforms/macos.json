@@ -1,0 +1,364 @@
+{
+  "title": "macOS",
+  "shell": "zsh",
+  "categories": [
+    {
+      "id": "recon",
+      "title": "Discovery",
+      "commands": [
+        {
+          "name": "system_profiler",
+          "usage": "system_profiler SPHardwareDataType",
+          "desc": "Hardware and OS details",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ifconfig",
+          "usage": "ifconfig",
+          "desc": "Interface configuration",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "netstat",
+          "usage": "netstat -an",
+          "desc": "Active sockets",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "lsof",
+          "usage": "lsof -i -P",
+          "desc": "Open files and sockets",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ps",
+          "usage": "ps aux",
+          "desc": "Running processes",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "launchctl",
+          "usage": "launchctl list",
+          "desc": "Loaded launch agents and daemons",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dscacheutil",
+          "usage": "dscacheutil -q user",
+          "desc": "Directory-service cache query",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "scutil",
+          "usage": "scutil --dns",
+          "desc": "Resolver configuration",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "networksetup",
+          "usage": "networksetup -listallhardwareports",
+          "desc": "Network hardware listing",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "arp",
+          "usage": "arp -a",
+          "desc": "ARP cache entries",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "sw_vers",
+          "usage": "sw_vers",
+          "desc": "macOS version",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "sysctl",
+          "usage": "sysctl -a",
+          "desc": "Kernel runtime parameters",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "csrutil",
+          "usage": "csrutil status",
+          "desc": "System Integrity Protection state",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "spctl",
+          "usage": "spctl --status",
+          "desc": "Gatekeeper assessment status",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "codesign",
+          "usage": "codesign -dv --verbose=4 $T",
+          "desc": "Inspect a code signature",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "xattr",
+          "usage": "xattr -l $T",
+          "desc": "Extended attributes and quarantine",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "defaults",
+          "usage": "defaults read com.apple.loginwindow",
+          "desc": "Read preference domains",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "mdls",
+          "usage": "mdls $T",
+          "desc": "Spotlight metadata of a file",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "dfir",
+      "title": "Forensics",
+      "commands": [
+        {
+          "name": "log",
+          "usage": "log show --last 1h --predicate 'eventType == logEvent'",
+          "desc": "Unified log records",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "fs_usage",
+          "usage": "sudo fs_usage -w -f filesys",
+          "desc": "Live filesystem activity",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "hdiutil",
+          "usage": "hdiutil attach -readonly $T",
+          "desc": "Attach a disk image",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "diskutil",
+          "usage": "diskutil list",
+          "desc": "List disks and volumes",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "mdfind",
+          "usage": "mdfind -onlyin / $T",
+          "desc": "Spotlight content search",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "sqlite3-tcc",
+          "usage": "sqlite3 ~/Library/Application\\ Support/com.apple.TCC/TCC.db '.tables'",
+          "desc": "Query a SQLite artifact database",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "plutil",
+          "usage": "plutil -p $T",
+          "desc": "Print a property list",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "pkgutil",
+          "usage": "pkgutil --pkgs",
+          "desc": "List installed packages",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "kextstat",
+          "usage": "kextstat",
+          "desc": "Loaded kernel extensions",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "security",
+          "usage": "security list-keychains",
+          "desc": "Keychain inventory",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "fseventsd",
+          "usage": "sudo fs_usage -f fsevents",
+          "desc": "Filesystem event activity",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "Audit",
+      "commands": [
+        {
+          "name": "spctl-assess",
+          "usage": "spctl --assess --verbose $T",
+          "desc": "Assess an app against Gatekeeper",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "csrutil-status",
+          "usage": "csrutil status",
+          "desc": "Confirm SIP is enabled",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "sudo-list",
+          "usage": "sudo -l",
+          "desc": "Allowed sudo commands for the user",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ls-acl",
+          "usage": "ls -lae /",
+          "desc": "Access control entries on a path",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "launchctl-audit",
+          "usage": "launchctl list | grep -v com.apple",
+          "desc": "Non-Apple launch items",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "commands": [
+        {
+          "name": "socketfilterfw",
+          "usage": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on",
+          "desc": "Enable the application firewall",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "spctl-master",
+          "usage": "sudo spctl --master-enable",
+          "desc": "Enable Gatekeeper enforcement",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "csrutil-enable",
+          "usage": "csrutil enable",
+          "desc": "Enable System Integrity Protection",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "pmset",
+          "usage": "pmset -g",
+          "desc": "Power-management settings",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "pwpolicy",
+          "usage": "pwpolicy getaccountpolicies",
+          "desc": "Password policy configuration",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "exploit",
+      "title": "Exploitation",
+      "commands": [
+        {
+          "name": "lazagne-mac",
+          "usage": "python3 lazagne.py all",
+          "desc": "Extract stored credentials",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "responder-mac",
+          "usage": "sudo responder -I en0",
+          "desc": "LLMNR/NBT-NS poisoning",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        }
+      ]
+    }
+  ]
+}

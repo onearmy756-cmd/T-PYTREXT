@@ -1,0 +1,301 @@
+//! Real memory backend: read/write MEMORY.md and USER.md in ~/.fundi/
+
+use async_trait::async_trait;
+use serde_json::json;
+use std::collections::HashSet;
+
+use crate::tools::memory::MemoryBackend;
+use fundi_core::ToolError;
+
+const ENTRY_DELIMITER: &str = "\n§\n";
+const MEMORY_CHAR_LIMIT: usize = 2200;
+const USER_CHAR_LIMIT: usize = 1375;
+
+/// Real memory backend that stores entries in ~/.fundi/memories/MEMORY.md and USER.md.
+pub struct FileMemoryBackend {
+    fundi_dir: std::path::PathBuf,
+}
+
+impl FileMemoryBackend {
+    pub fn new() -> Self {
+        let home = dirs_home().unwrap_or_else(|| std::path::PathBuf::from("."));
+        Self {
+            fundi_dir: home.join(".fundi").join("memories"),
+        }
+    }
+
+    pub fn with_dir(dir: std::path::PathBuf) -> Self {
+        Self { fundi_dir: dir }
+    }
+
+    fn path_for(&self, target: &str) -> Result<std::path::PathBuf, ToolError> {
+        match target {
+            "memory" => Ok(self.fundi_dir.join("MEMORY.md")),
+            "user" => Ok(self.fundi_dir.join("USER.md")),
+            _ => Err(ToolError::InvalidParams(format!(
+                "Invalid target '{}'. Use 'memory' or 'user'.",
+                target
+            ))),
+        }
+    }
+
+    async fn ensure_dir(&self) -> Result<(), ToolError> {
+        tokio::fs::create_dir_all(&self.fundi_dir)
+            .await
+            .map_err(|e| {
+                ToolError::ExecutionFailed(format!("Failed to create ~/.fundi/memories: {}", e))
+            })
+    }
+
+    async fn read_file(&self, path: &std::path::Path) -> Result<String, ToolError> {
+        match tokio::fs::read_to_string(path).await {
+            Ok(content) => Ok(content),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+            Err(e) => Err(ToolError::ExecutionFailed(format!(
+                "Failed to read '{}': {}",
+                path.display(),
+                e
+            ))),
+        }
+    }
+
+    async fn write_file(&self, path: &std::path::Path, content: &str) -> Result<(), ToolError> {
+        self.ensure_dir().await?;
+        tokio::fs::write(path, content).await.map_err(|e| {
+            ToolError::ExecutionFailed(format!("Failed to write '{}': {}", path.display(), e))
+        })
+    }
+
+    fn parse_entries(content: &str) -> Vec<String> {
+        if content.trim().is_empty() {
+            return Vec::new();
+        }
+        content
+            .split(ENTRY_DELIMITER)
+            .map(str::trim)
+            .filter(|e| !e.is_empty())
+            .map(ToString::to_string)
+            .collect()
+    }
+
+    fn format_entries(entries: &[String]) -> String {
+        entries.join(ENTRY_DELIMITER)
+    }
+
+    fn preview(text: &str) -> String {
+        if text.chars().count() <= 80 {
+            text.to_string()
+        } else {
+            let head: String = text.chars().take(80).collect();
+            format!("{head}...")
+        }
+    }
+
+    fn success_response(target: &str, entries: &[String], message: &str) -> String {
+        let limit = if target == "user" {
+            USER_CHAR_LIMIT
+        } else {
+            MEMORY_CHAR_LIMIT
+        };
+        let current = entries.join(ENTRY_DELIMITER).chars().count();
+        let pct = current
+            .checked_mul(100)
+            .and_then(|v| v.checked_div(limit))
+            .unwrap_or(0)
+            .min(100);
+        json!({
+            "success": true,
+            "target": target,
+            "message": message,
+            "entries": entries,
+            "entry_count": entries.len(),
+            "usage": format!("{pct}% - {current}/{limit} chars")
+        })
+        .to_string()
+    }
+
+    fn char_limit_for(target: &str) -> usize {
+        if target == "user" {
+            USER_CHAR_LIMIT
+        } else {
+            MEMORY_CHAR_LIMIT
+        }
+    }
+}
+
+impl Default for FileMemoryBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+fn dirs_home() -> Option<std::path::PathBuf> {
+    std::env::var("HOME").ok().map(std::path::PathBuf::from)
+}
+
+#[async_trait]
+impl MemoryBackend for FileMemoryBackend {
+    async fn add(&self, target: &str, content: &str) -> Result<String, ToolError> {
+        let path = self.path_for(target)?;
+        let trimmed = content.trim();
+        if trimmed.is_empty() {
+            return Err(ToolError::InvalidParams(
+                "Content cannot be empty for action='add'.".to_string(),
+            ));
+        }
+
+        let content = self.read_file(&path).await?;
+        let mut entries = Self::parse_entries(&content);
+
+        if entries.iter().any(|e| e == trimmed) {
+            return Ok(Self::success_response(
+                target,
+                &entries,
+                "Entry already exists (no duplicate added).",
+            ));
+        }
+
+        let mut new_entries = entries.clone();
+        new_entries.push(trimmed.to_string());
+        let new_total = new_entries.join(ENTRY_DELIMITER).chars().count();
+        let limit = Self::char_limit_for(target);
+        if new_total > limit {
+            let current = entries.join(ENTRY_DELIMITER).chars().count();
+            return Err(ToolError::ExecutionFailed(format!(
+                "Memory at {current}/{limit} chars. Adding this entry ({}) would exceed the limit.",
+                trimmed.chars().count()
+            )));
+        }
+
+        entries = new_entries;
+        self.write_file(&path, &Self::format_entries(&entries))
+            .await?;
+        Ok(Self::success_response(target, &entries, "Entry added."))
+    }
+
+    async fn replace(
+        &self,
+        target: &str,
+        old_text: &str,
+        new_content: &str,
+    ) -> Result<String, ToolError> {
+        let path = self.path_for(target)?;
+        let old_text = old_text.trim();
+        let new_content = new_content.trim();
+        if old_text.is_empty() {
+            return Err(ToolError::InvalidParams(
+                "old_text cannot be empty for action='replace'.".to_string(),
+            ));
+        }
+        if new_content.is_empty() {
+            return Err(ToolError::InvalidParams(
+                "content cannot be empty for action='replace'.".to_string(),
+            ));
+        }
+
+        let content = self.read_file(&path).await?;
+        let mut entries = Self::parse_entries(&content);
+
+        let matches: Vec<usize> = entries
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, e)| {
+                if e.contains(old_text) {
+                    Some(idx)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        if matches.is_empty() {
+            return Err(ToolError::ExecutionFailed(format!(
+                "No entry matched '{}'.",
+                old_text
+            )));
+        }
+
+        if matches.len() > 1 {
+            let distinct: HashSet<String> = matches.iter().map(|i| entries[*i].clone()).collect();
+            if distinct.len() > 1 {
+                let previews: Vec<String> = matches
+                    .iter()
+                    .map(|i| Self::preview(&entries[*i]))
+                    .collect();
+                return Err(ToolError::ExecutionFailed(format!(
+                    "Multiple entries matched '{}'. Be more specific. Matches: {}",
+                    old_text,
+                    previews.join(" | ")
+                )));
+            }
+        }
+
+        let idx = matches[0];
+        let mut candidate = entries.clone();
+        candidate[idx] = new_content.to_string();
+        let new_total = candidate.join(ENTRY_DELIMITER).chars().count();
+        let limit = Self::char_limit_for(target);
+        if new_total > limit {
+            return Err(ToolError::ExecutionFailed(format!(
+                "Replacement would put memory at {new_total}/{limit} chars."
+            )));
+        }
+        entries = candidate;
+        self.write_file(&path, &Self::format_entries(&entries))
+            .await?;
+        Ok(Self::success_response(target, &entries, "Entry replaced."))
+    }
+
+    async fn remove(&self, target: &str, old_text: &str) -> Result<String, ToolError> {
+        let path = self.path_for(target)?;
+        let old_text = old_text.trim();
+        if old_text.is_empty() {
+            return Err(ToolError::InvalidParams(
+                "old_text cannot be empty for action='remove'.".to_string(),
+            ));
+        }
+
+        let content = self.read_file(&path).await?;
+        let mut entries = Self::parse_entries(&content);
+        let matches: Vec<usize> = entries
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, e)| {
+                if e.contains(old_text) {
+                    Some(idx)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        if matches.is_empty() {
+            return Err(ToolError::ExecutionFailed(format!(
+                "No entry matched '{}'.",
+                old_text
+            )));
+        }
+
+        if matches.len() > 1 {
+            let distinct: HashSet<String> = matches.iter().map(|i| entries[*i].clone()).collect();
+            if distinct.len() > 1 {
+                let previews: Vec<String> = matches
+                    .iter()
+                    .map(|i| Self::preview(&entries[*i]))
+                    .collect();
+                return Err(ToolError::ExecutionFailed(format!(
+                    "Multiple entries matched '{}'. Be more specific. Matches: {}",
+                    old_text,
+                    previews.join(" | ")
+                )));
+            }
+        }
+
+        let idx = matches[0];
+        entries.remove(idx);
+        self.write_file(&path, &Self::format_entries(&entries))
+            .await?;
+
+        Ok(Self::success_response(target, &entries, "Entry removed."))
+    }
+}

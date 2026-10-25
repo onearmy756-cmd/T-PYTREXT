@@ -1,0 +1,252 @@
+{
+  "title": "UOS (Deepin / UnionTech)",
+  "shell": "bash",
+  "categories": [
+    {
+      "id": "recon",
+      "title": "System",
+      "commands": [
+        {
+          "name": "uname",
+          "usage": "uname -a",
+          "desc": "Kernel and architecture",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ss",
+          "usage": "ss -tulpn",
+          "desc": "Listening sockets",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dpkg",
+          "usage": "dpkg -l",
+          "desc": "Installed packages",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "systemctl",
+          "usage": "systemctl list-units --type=service",
+          "desc": "Service inventory",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "hostnamectl",
+          "usage": "hostnamectl",
+          "desc": "Host and OS identity",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ip",
+          "usage": "ip addr show",
+          "desc": "Interface addresses",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "lsof",
+          "usage": "lsof -i -P -n",
+          "desc": "Open sockets and files",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ps",
+          "usage": "ps aux",
+          "desc": "Running processes",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "last",
+          "usage": "last -a",
+          "desc": "Login history",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "dfir",
+      "title": "Forensics",
+      "commands": [
+        {
+          "name": "journalctl",
+          "usage": "journalctl -p err -b",
+          "desc": "System journal errors",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ausearch",
+          "usage": "ausearch -m avc -ts recent",
+          "desc": "Search audit records",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "aureport",
+          "usage": "aureport --summary",
+          "desc": "Summarise audit events",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "lastlog",
+          "usage": "lastlog",
+          "desc": "Last login per account",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "utmpdump",
+          "usage": "utmpdump /var/log/wtmp",
+          "desc": "Raw login records",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "sysdig",
+          "usage": "sysdig -c topfiles_bytes",
+          "desc": "Live system call capture",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "Audit",
+      "commands": [
+        {
+          "name": "lynis",
+          "usage": "lynis audit system",
+          "desc": "System hardening audit",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "dpkg-verify",
+          "usage": "dpkg -V",
+          "desc": "Verify package integrity",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "debsums",
+          "usage": "debsums -s",
+          "desc": "Check installed file checksums",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ss-audit",
+          "usage": "ss -tulpn",
+          "desc": "Review listening services",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "commands": [
+        {
+          "name": "ufw",
+          "usage": "ufw enable",
+          "desc": "Simple host firewall",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "iptables",
+          "usage": "iptables -L -n -v",
+          "desc": "Inspect the packet filter",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "fail2ban-client",
+          "usage": "fail2ban-client status",
+          "desc": "Brute-force protection status",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "sysctl",
+          "usage": "sysctl -a",
+          "desc": "Kernel runtime parameters",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "aa-status",
+          "usage": "aa-status",
+          "desc": "AppArmor confinement status",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "unattended-upgrades",
+          "usage": "unattended-upgrade --dry-run",
+          "desc": "Automatic security updates",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "gui",
+      "title": "Desktop",
+      "commands": [
+        {
+          "name": "deepin-system-monitor",
+          "usage": "deepin-system-monitor",
+          "desc": "Graphical system monitor",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "deepin-terminal",
+          "usage": "deepin-terminal",
+          "desc": "Terminal emulator",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    }
+  ]
+}

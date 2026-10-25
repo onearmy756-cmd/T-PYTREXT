@@ -639,5 +639,48 @@ def deploy_quick(target):
         sys.exit(1)
 
 
+@main.command()
+@click.option("--start", "do_start", is_flag=True, help="Build canvas + anzisha backend")
+@click.option("--serve", "do_serve", is_flag=True, help="Endesha server halisi (OpenHands interface + zana zote)")
+@click.option("--port", "-p", default=8080, help="Port ya server (default 8080)")
+@click.option("--host", default="0.0.0.0", help="Host ya server")
+@click.option("--workspace", "-w", default=".", help="Workspace ya IDE")
+@click.option("--tools", "show_tools", is_flag=True, help="Orodhesha zana zote za IDE")
+@click.option("--home", default=None, help="Njia ya folda ya ide/ (default: autodetect)")
+def ide(do_start, do_serve, port, host, workspace, show_tools, home):
+    """
+    MBILINYI IDE — OpenHands Agent Canvas + zana zote za IDE.
+
+    Examples:
+        pytrex ide                     # hali + plan
+        pytrex ide --tools             # orodhesha zana (LSP, DAP, build, swarm…)
+        pytrex ide --start             # build canvas + anzisha backend
+        pytrex ide --serve -p 8080     # endesha server HALISI (OpenHands interface)
+    """
+    import json as _json
+    from pytrex.ide import IDEEngine
+
+    if show_tools:
+        click.echo(_json.dumps(IDEEngine(home=home).tools.catalog(), indent=2))
+        return
+
+    if do_serve:
+        from pytrex.agent_server import AgentServer
+
+        click.echo(f"  🧠 MBILINYI IDE — http://{host}:{port}/ide")
+        click.echo(f"  🔌 agent-server  — http://{host}:{port}/server_info")
+        AgentServer(host=host, port=port, workspace=workspace, home=home).start(background=False)
+        return
+
+    engine = IDEEngine(home=home)
+
+    if do_start:
+        click.echo(_json.dumps(engine.start(), indent=2))
+        return
+
+    click.echo(_json.dumps(engine.status(), indent=2))
+    click.echo("\n" + _json.dumps(engine.plan(), indent=2))
+
+
 if __name__ == "__main__":
     main()

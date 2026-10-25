@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "description": "Golden JSON parity modules (all entries are active with fixtures under fixtures/). Roadmap items such as send_message / Tirith live in PARITY_PLAN.md until fixtures land.",
+  "modules": [
+    {
+      "id": "anthropic_adapter",
+      "status": "active",
+      "python": "agent/anthropic_adapter.py",
+      "rust": "fundi_intelligence::anthropic_adapter",
+      "fixture_dirs": ["anthropic_adapter"]
+    },
+    {
+      "id": "fundi_core_tool_format",
+      "status": "active",
+      "python": "N/A (Fundi XML round-trip)",
+      "rust": "fundi_core::tool_call_parser::format_tool_calls",
+      "fixture_dirs": ["fundi_core"]
+    },
+    {
+      "id": "checkpoint_manager",
+      "status": "active",
+      "python": "tools/checkpoint_manager.py",
+      "rust": "fundi_parity_tests::harness::checkpoint_shadow_dir_id",
+      "fixture_dirs": ["checkpoint_manager"],
+      "note": "Full snapshot/rollback parity requires Rust checkpoint backend + git2 tests."
+    },
+    {
+      "id": "model_metadata",
+      "status": "active",
+      "python": "agent/model_metadata.py",
+      "rust": "fundi_intelligence::model_metadata",
+      "fixture_dirs": ["model_metadata"]
+    },
+    {
+      "id": "usage_pricing",
+      "status": "active",
+      "python": "agent/usage_pricing.py",
+      "rust": "fundi_intelligence::usage_pricing",
+      "fixture_dirs": ["usage_pricing"]
+    },
+    {
+      "id": "approval",
+      "status": "active",
+      "python": "tools/approval.py",
+      "rust": "fundi_tools::approval",
+      "fixture_dirs": ["approval"]
+    },
+    {
+      "id": "v4a_patch",
+      "status": "active",
+      "python": "tools/patch_parser.py",
+      "rust": "fundi_tools::v4a_patch",
+      "fixture_dirs": ["v4a_patch"]
+    }
+  ]
+}

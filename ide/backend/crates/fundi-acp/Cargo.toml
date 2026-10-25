@@ -1,0 +1,21 @@
+[package]
+name = "fundi-acp"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Agent Communication Protocol adapter for Fundi Agent"
+
+[dependencies]
+fundi-core = { workspace = true }
+fundi-agent = { workspace = true }
+fundi-config = { workspace = true }
+fundi-tools = { workspace = true }
+fundi-environments = { workspace = true }
+fundi-skills = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+uuid = { workspace = true }

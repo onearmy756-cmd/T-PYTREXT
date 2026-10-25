@@ -91,6 +91,14 @@ from .production import (
     deploy, quick_build,
 )
 
+# === PyTreXT Extended: MBILINYI IDE (OpenHands Agent Canvas + IDE tools) ===
+from .ide import (
+    IDEEngine, IDEToolRegistry, IDETool, ComponentStatus,
+    MBILINYIIDE, ide_home,
+)
+from .ide_server import IDEServer, ToolBridge
+from .agent_server import AgentServer, AgentRuntime, ConversationStore, Conversation
+
 __all__ = [
     "PyTreXApp", "event", "ElixirClient", "BLOCKCHAIN_CACHE",
     "execute_python_event", "execute_python_event_async",
@@ -162,4 +170,9 @@ __all__ = [
     # === PyTreXT Extended: Production Builder ===
     "ProductionBuilder", "ProductionConfig", "DeployTarget",
     "deploy", "quick_build",
+    # === PyTreXT Extended: MBILINYI IDE ===
+    "IDEEngine", "IDEToolRegistry", "IDETool", "ComponentStatus",
+    "MBILINYIIDE", "ide_home",
+    "IDEServer", "ToolBridge", "AgentServer", "AgentRuntime",
+    "ConversationStore", "Conversation",
 ]

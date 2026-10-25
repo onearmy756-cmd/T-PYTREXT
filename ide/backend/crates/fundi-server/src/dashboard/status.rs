@@ -1,0 +1,94 @@
+//! GET /api/status — agent status overview.
+
+use axum::extract::State;
+use axum::Json;
+use std::collections::HashMap;
+use std::fs;
+use std::sync::atomic::Ordering;
+
+use super::types::StatusResponse;
+use crate::HttpServerState;
+
+pub async fn get_status(State(state): State<HttpServerState>) -> Json<StatusResponse> {
+    let fundi_home = state.fundi_home.display().to_string();
+    let config_path = state.fundi_home.join("config.yaml").display().to_string();
+    let env_path = state.fundi_home.join(".env").display().to_string();
+
+    // Prefer runtime-backed gateway status when available.
+    let (gateway_running, gateway_pid) =
+        if let Some(runtime_gateway_running) = &state.runtime_gateway_running {
+            let running = runtime_gateway_running.load(Ordering::Relaxed);
+            let pid = if running {
+                Some(std::process::id())
+            } else {
+                None
+            };
+            (running, pid)
+        } else {
+            // Backward-compatible fallback for standalone gateway process mode.
+            let pid_file_path = state.fundi_home.join("gateway.pid");
+            if pid_file_path.exists() {
+                if let Ok(pid_str) = fs::read_to_string(&pid_file_path) {
+                    if let Ok(pid) = pid_str.trim().parse::<u32>() {
+                        // Check if process is alive (Unix-specific)
+                        #[cfg(unix)]
+                        let is_alive = unsafe { libc::kill(pid as i32, 0) == 0 };
+                        #[cfg(not(unix))]
+                        let is_alive = false; // On non-Unix, assume not running
+
+                        if is_alive {
+                            (true, Some(pid))
+                        } else {
+                            (false, Some(pid))
+                        }
+                    } else {
+                        (false, None)
+                    }
+                } else {
+                    (false, None)
+                }
+            } else {
+                (false, None)
+            }
+        };
+
+    // Query active session count from SQLite directly
+    let db_path = state.fundi_home.join("sessions.db");
+    let active_sessions = if db_path.exists() {
+        if let Ok(conn) = rusqlite::Connection::open(&db_path) {
+            conn.query_row("SELECT COUNT(DISTINCT id) FROM sessions", [], |row| {
+                row.get::<_, u32>(0)
+            })
+            .unwrap_or(0)
+        } else {
+            0
+        }
+    } else {
+        0
+    };
+
+    // Gateway platforms - empty for now since we're decoupled
+    let gateway_platforms = HashMap::new();
+
+    Json(StatusResponse {
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        release_date: String::new(),
+        fundi_home,
+        config_path,
+        env_path,
+        config_version: 1,
+        latest_config_version: 1,
+        active_sessions,
+        gateway_running,
+        gateway_pid,
+        gateway_state: if gateway_running {
+            Some("running".to_string())
+        } else {
+            None
+        },
+        gateway_health_url: None,
+        gateway_exit_reason: None,
+        gateway_updated_at: None,
+        gateway_platforms,
+    })
+}

@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-Cyuzqnbw.js";import{St as t,yt as n}from"./vendor-styling-IswJGxFM.js";var r=e(t(),1),i=n(),a=r.createContext({currentPath:`/`,conversationId:null,isNavigating:!1,navigate:()=>{}});function o({value:e,children:t}){return(0,i.jsx)(a.Provider,{value:e,children:t})}function s(){return r.useContext(a)}export{s as n,o as t};

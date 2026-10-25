@@ -1,0 +1,1 @@
+import{yt as e}from"./vendor-styling-IswJGxFM.js";import{t}from"./utils-tjTScIp3.js";var n=e();function r({children:e,className:r,...i}){return(0,n.jsx)(`span`,{className:t(`text-sm leading-4 text-[var(--oh-accent-foreground)] font-semibold tracking-tighter bg-primary p-1 rounded-full`,r),...i,children:e})}export{r as t};

@@ -1,0 +1,16 @@
+[package]
+name = "fundi-parity-tests"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Python↔Rust parity fixtures and harness for Fundi Agent"
+
+[dependencies]
+fundi-core = { workspace = true }
+fundi-intelligence = { workspace = true }
+fundi-tools = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = "0.10"
+thiserror = { workspace = true }

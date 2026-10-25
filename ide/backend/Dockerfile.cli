@@ -1,0 +1,40 @@
+# ----- Chef stage (dependency caching) -----
+FROM rust:1-bookworm AS chef
+RUN cargo install cargo-chef --locked
+WORKDIR /app
+
+# ----- Plan stage -----
+FROM chef AS planner
+COPY Cargo.toml Cargo.lock ./
+COPY crates crates
+RUN cargo chef prepare --recipe-path recipe.json
+
+# ----- Build stage -----
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies only (cached unless Cargo.toml/lock change)
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# Copy source and build the actual binary
+COPY Cargo.toml Cargo.lock ./
+COPY crates crates
+RUN cargo build --release -p fundi-cli
+
+# ----- Runtime stage -----
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash fundi
+
+COPY --from=builder /app/target/release/fundi /usr/local/bin/fundi
+
+USER fundi
+ENV FUNDI_HOME=/data
+VOLUME ["/data"]
+
+HEALTHCHECK --interval=60s --timeout=5s --retries=3 \
+    CMD fundi doctor || exit 1
+
+ENTRYPOINT ["fundi"]

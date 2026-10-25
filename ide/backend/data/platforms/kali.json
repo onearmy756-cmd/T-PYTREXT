@@ -1,0 +1,1116 @@
+{
+  "title": "Kali Linux",
+  "shell": "bash",
+  "categories": [
+    {
+      "id": "recon",
+      "title": "Reconnaissance",
+      "commands": [
+        {
+          "name": "nmap",
+          "usage": "nmap -sV -Pn $T",
+          "desc": "Service and version scan of the target",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "masscan",
+          "usage": "masscan -p1-65535 $T --rate 1000",
+          "desc": "Fast port sweep across the range",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "whois",
+          "usage": "whois $T",
+          "desc": "Registration records for a domain",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dnsrecon",
+          "usage": "dnsrecon -d $T",
+          "desc": "DNS enumeration of a domain",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dnsenum",
+          "usage": "dnsenum --enum $T",
+          "desc": "Zone transfer and record enumeration",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "fierce",
+          "usage": "fierce --domain $T",
+          "desc": "DNS reconnaissance of a domain",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "theHarvester",
+          "usage": "theHarvester -d $T -b all",
+          "desc": "OSINT emails, hosts and subdomains",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "amass",
+          "usage": "amass enum -d $T",
+          "desc": "Attack surface and subdomain enumeration",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "subfinder",
+          "usage": "subfinder -d $T",
+          "desc": "Passive subdomain discovery",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "arp-scan",
+          "usage": "arp-scan $T",
+          "desc": "ARP sweep of a local network",
+          "target": "cidr",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "netdiscover",
+          "usage": "netdiscover -r $T",
+          "desc": "Passive ARP host discovery",
+          "target": "cidr",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "fping",
+          "usage": "fping -asg $T",
+          "desc": "Ping sweep of a range",
+          "target": "cidr",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "traceroute",
+          "usage": "traceroute $T",
+          "desc": "Path of hops to the target",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dig",
+          "usage": "dig any $T",
+          "desc": "DNS record lookup",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "host",
+          "usage": "host -a $T",
+          "desc": "DNS lookup for a name",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "nslookup",
+          "usage": "nslookup $T",
+          "desc": "Query DNS servers",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "enum4linux",
+          "usage": "enum4linux -a $T",
+          "desc": "SMB and NetBIOS enumeration",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "smbclient",
+          "usage": "smbclient -L //$T -N",
+          "desc": "List SMB shares on a host",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "rpcclient",
+          "usage": "rpcclient -U '' -N $T",
+          "desc": "Enumerate RPC endpoints",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "nbtscan",
+          "usage": "nbtscan $T",
+          "desc": "NetBIOS name scan",
+          "target": "cidr",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "snmpwalk",
+          "usage": "snmpwalk -v2c -c public $T",
+          "desc": "Walk SNMP MIB of a device",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "ldapsearch",
+          "usage": "ldapsearch -x -H ldap://$T -s base",
+          "desc": "Query an LDAP directory",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "title": "Web",
+      "commands": [
+        {
+          "name": "nikto",
+          "usage": "nikto -h $T",
+          "desc": "Web server misconfiguration scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "gobuster",
+          "usage": "gobuster dir -u $T -w /usr/share/wordlists/dirb/common.txt",
+          "desc": "Directory and file brute force",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "ffuf",
+          "usage": "ffuf -u $T/FUZZ -w /usr/share/wordlists/dirb/common.txt",
+          "desc": "Fast web fuzzing of paths",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "feroxbuster",
+          "usage": "feroxbuster -u $T",
+          "desc": "Recursive content discovery",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "dirb",
+          "usage": "dirb $T",
+          "desc": "Dictionary-based content scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "wfuzz",
+          "usage": "wfuzz -c -z file,/usr/share/wordlists/dirb/common.txt $T/FUZZ",
+          "desc": "Fuzzing of parameters and paths",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "whatweb",
+          "usage": "whatweb -v $T",
+          "desc": "Fingerprint web technologies",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "wpscan",
+          "usage": "wpscan --url $T --enumerate vp",
+          "desc": "WordPress vulnerability scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "sqlmap",
+          "usage": "sqlmap -u $T --batch --level 2",
+          "desc": "SQL injection detection",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "dalfox",
+          "usage": "dalfox url $T",
+          "desc": "XSS scanning of a URL",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "xsstrike",
+          "usage": "xsstrike -u $T",
+          "desc": "XSS fuzzing and analysis",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "commix",
+          "usage": "commix --url $T",
+          "desc": "Command injection testing",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "wapiti",
+          "usage": "wapiti -u $T",
+          "desc": "Web application vulnerability scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "nuclei",
+          "usage": "nuclei -u $T -severity medium,high,critical",
+          "desc": "Template-driven vulnerability scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "zaproxy",
+          "usage": "zaproxy -cmd -quickurl $T -quickout report.html",
+          "desc": "OWASP ZAP baseline scan",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "sslscan",
+          "usage": "sslscan $T",
+          "desc": "TLS cipher and protocol scan",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "testssl",
+          "usage": "testssl.sh $T",
+          "desc": "Deep TLS configuration audit",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ssh-audit",
+          "usage": "ssh-audit $T",
+          "desc": "SSH server configuration audit",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "curl",
+          "usage": "curl -sS -I http://$T",
+          "desc": "Fetch headers of a web resource",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "mitmproxy",
+          "usage": "mitmproxy --mode regular --listen-port 8080",
+          "desc": "Intercept and inspect HTTP traffic",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "title": "API",
+      "commands": [
+        {
+          "name": "kiterunner",
+          "usage": "kr scan $T -w routes.kite",
+          "desc": "Discover undocumented API routes",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "graphql-cop",
+          "usage": "graphql-cop -t $T",
+          "desc": "GraphQL misconfiguration audit",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "grpcurl",
+          "usage": "grpcurl -plaintext $T list",
+          "desc": "List gRPC services",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "jwt_tool",
+          "usage": "jwt_tool $T",
+          "desc": "Test JWT signing weaknesses",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "arjun",
+          "usage": "arjun -u $T",
+          "desc": "Discover hidden HTTP parameters",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "httpx",
+          "usage": "httpx -u $T -title -tech-detect -status-code",
+          "desc": "Probe live HTTP services",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "cloud",
+      "title": "Cloud and containers",
+      "commands": [
+        {
+          "name": "aws",
+          "usage": "aws sts get-caller-identity --endpoint-url $T",
+          "desc": "Check the active AWS identity",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "az",
+          "usage": "az account show",
+          "desc": "Show the active Azure context",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "gcloud",
+          "usage": "gcloud auth list",
+          "desc": "List Google Cloud credentials",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "kubectl",
+          "usage": "kubectl --server $T get pods -A",
+          "desc": "List cluster pods",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "kube-hunter",
+          "usage": "kube-hunter --remote $T",
+          "desc": "Hunt for Kubernetes weaknesses",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "trivy",
+          "usage": "trivy image $T",
+          "desc": "Scan a container image for CVEs",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "scoutsuite",
+          "usage": "scoutsuite aws --report-dir ./scout",
+          "desc": "Cloud configuration audit",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "pacu",
+          "usage": "pacu",
+          "desc": "AWS exploitation framework",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "s3scanner",
+          "usage": "s3scanner scan --bucket $T",
+          "desc": "Find open S3 buckets",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "docker-bench-security",
+          "usage": "docker-bench-security",
+          "desc": "Docker host hardening checks",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "kubeaudit",
+          "usage": "kubeaudit all -f manifest.yaml",
+          "desc": "Kubernetes manifest audit",
+          "target": "url",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "wireless",
+      "title": "Wireless",
+      "commands": [
+        {
+          "name": "airmon-ng",
+          "usage": "airmon-ng start wlan0",
+          "desc": "Put a card into monitor mode",
+          "target": "iface",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "airodump-ng",
+          "usage": "airodump-ng wlan0mon",
+          "desc": "Capture 802.11 frames",
+          "target": "iface",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "aireplay-ng",
+          "usage": "aireplay-ng --deauth 10 -a $T wlan0mon",
+          "desc": "Inject 802.11 frames",
+          "target": "bssid",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "aircrack-ng",
+          "usage": "aircrack-ng -w rockyou.txt capture.cap",
+          "desc": "Crack captured WPA handshakes",
+          "target": "file",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "wifite",
+          "usage": "wifite --kill",
+          "desc": "Automated wireless auditing",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "bettercap",
+          "usage": "bettercap -iface wlan0",
+          "desc": "MITM and wireless toolkit",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "reaver",
+          "usage": "reaver -i wlan0mon -b $T",
+          "desc": "WPS PIN attack",
+          "target": "bssid",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "kismet",
+          "usage": "kismet -c wlan0",
+          "desc": "Wireless network discovery",
+          "target": "iface",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "hcxdumptool",
+          "usage": "hcxdumptool -i wlan0mon -o dump.pcapng",
+          "desc": "Capture PMKID and handshakes",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "title": "Network",
+      "commands": [
+        {
+          "name": "nc",
+          "usage": "nc -nv $T 443",
+          "desc": "Netcat connection to a port",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "socat",
+          "usage": "socat - TCP:$T:80",
+          "desc": "Relay and tunnel TCP streams",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "hping3",
+          "usage": "hping3 -S -p 80 $T",
+          "desc": "Craft and send custom packets",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "arpspoof",
+          "usage": "arpspoof -i eth0 -t $T",
+          "desc": "ARP spoofing on a segment",
+          "target": "host",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "ettercap",
+          "usage": "ettercap -T -q -i eth0 -M arp",
+          "desc": "LAN MITM attack",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "macchanger",
+          "usage": "macchanger -r eth0",
+          "desc": "Change the interface MAC",
+          "target": "iface",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "proxychains",
+          "usage": "proxychains nmap -sT -Pn $T",
+          "desc": "Route tools through proxies",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "sshuttle",
+          "usage": "sshuttle -r user@$T 0.0.0.0/0",
+          "desc": "Transparent VPN over SSH",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "chisel",
+          "usage": "chisel client $T 1080:socks",
+          "desc": "Tunnel traffic over HTTP",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "exploit",
+      "title": "Exploitation",
+      "commands": [
+        {
+          "name": "msfconsole",
+          "usage": "msfconsole -q -x 'use exploit/multi/handler; exit'",
+          "desc": "Metasploit framework console",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "msfvenom",
+          "usage": "msfvenom -p linux/x64/shell_reverse_tcp LHOST=$T LPORT=4444 -f elf",
+          "desc": "Generate a payload",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "searchsploit",
+          "usage": "searchsploit $T",
+          "desc": "Search the Exploit-DB archive",
+          "target": "keyword",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "crackmapexec",
+          "usage": "crackmapexec smb $T",
+          "desc": "Swiss-army SMB/AD tool",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "impacket-psexec",
+          "usage": "impacket-psexec $T",
+          "desc": "Remote execution over SMB",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "responder",
+          "usage": "responder -I eth0 -wrf",
+          "desc": "Poison LLMNR/NBT-NS/mDNS",
+          "target": "iface",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "sliver",
+          "usage": "sliver-server",
+          "desc": "Command-and-control framework",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "nuclei-cve",
+          "usage": "nuclei -u $T -t cves/",
+          "desc": "Exploit known CVEs by template",
+          "target": "url",
+          "risk": "high",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "postex",
+      "title": "Post-exploitation",
+      "commands": [
+        {
+          "name": "impacket-secretsdump",
+          "usage": "impacket-secretsdump $T",
+          "desc": "Dump secrets from a host",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "impacket-wmiexec",
+          "usage": "impacket-wmiexec $T",
+          "desc": "Remote execution over WMI",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "evil-winrm",
+          "usage": "evil-winrm -i $T -u user -p pass",
+          "desc": "Interactive WinRM shell",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "bloodhound-python",
+          "usage": "bloodhound-python -d $T -c all",
+          "desc": "Collect AD attack paths",
+          "target": "domain",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "ligolo-ng",
+          "usage": "ligolo-ng -selfcert",
+          "desc": "Tunnelling proxy for pivoting",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "lazagne",
+          "usage": "lazagne all",
+          "desc": "Extract stored credentials",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "rubeus",
+          "usage": "rubeus kerberoast",
+          "desc": "Kerberos attack toolkit",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "active-directory",
+      "title": "Active Directory",
+      "commands": [
+        {
+          "name": "kerbrute",
+          "usage": "kerbrute userenum --dc $T -d domain.local users.txt",
+          "desc": "Enumerate and spray Kerberos",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "impacket-GetUserSPNs",
+          "usage": "impacket-GetUserSPNs $T -request",
+          "desc": "Kerberoasting of service accounts",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "impacket-GetNPUsers",
+          "usage": "impacket-GetNPUsers $T -no-pass",
+          "desc": "AS-REP roasting of accounts",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "mitm6",
+          "usage": "mitm6 -d $T",
+          "desc": "IPv6 DNS takeover",
+          "target": "domain",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "ldapdomaindump",
+          "usage": "ldapdomaindump $T",
+          "desc": "Dump the LDAP directory",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "dfir",
+      "title": "Forensics and DFIR",
+      "commands": [
+        {
+          "name": "volatility3",
+          "usage": "volatility3 -f memory.raw windows.info",
+          "desc": "Memory image analysis",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "binwalk",
+          "usage": "binwalk -e firmware.bin",
+          "desc": "Extract embedded filesystems",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "foremost",
+          "usage": "foremost -i image.dd -o out",
+          "desc": "Carve files from a disk image",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "fls",
+          "usage": "fls -r -o 2048 image.dd",
+          "desc": "List filesystem entries with Sleuth Kit",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "bulk_extractor",
+          "usage": "bulk_extractor -o out image.dd",
+          "desc": "Carve artifacts from raw media",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "exiftool",
+          "usage": "exiftool $T",
+          "desc": "Read file metadata",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "strings",
+          "usage": "strings -a $T",
+          "desc": "Extract printable strings",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "tcpdump",
+          "usage": "tcpdump -i eth0 -w capture.pcap",
+          "desc": "Capture live network traffic",
+          "target": "iface",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "tshark",
+          "usage": "tshark -r capture.pcap -q -z io,phs",
+          "desc": "Analyse a packet capture",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "autopsy",
+          "usage": "autopsy",
+          "desc": "Graphical forensic case manager",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "chkrootkit",
+          "usage": "chkrootkit",
+          "desc": "Check for local rootkits",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "rkhunter",
+          "usage": "rkhunter --check",
+          "desc": "Rootkit hunter scan",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "clamscan",
+          "usage": "clamscan -r /home",
+          "desc": "Antivirus scan of a path",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dd",
+          "usage": "dd if=$T of=image.dd bs=4M conv=noerror,sync",
+          "desc": "Image a device or file",
+          "target": "file",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "log2timeline",
+          "usage": "log2timeline.py timeline.plaso $T",
+          "desc": "Build a forensic timeline",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "regripper",
+          "usage": "rip.pl -r NTUSER.DAT -f ntuser",
+          "desc": "Parse Windows registry hives",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "Audit and compliance",
+      "commands": [
+        {
+          "name": "lynis",
+          "usage": "lynis audit system",
+          "desc": "System hardening audit",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "oscap",
+          "usage": "oscap xccdf eval --profile cis profile.xml",
+          "desc": "SCAP compliance evaluation",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "gvm-cli",
+          "usage": "gvm-cli --gmp-username admin --gmp-password pass socket",
+          "desc": "OpenVAS/GVM scan control",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "aa-status",
+          "usage": "aa-status",
+          "desc": "AppArmor confinement status",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "auditctl",
+          "usage": "auditctl -l",
+          "desc": "List audit rules",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "dpkg-verify",
+          "usage": "dpkg -V",
+          "desc": "Verify installed package integrity",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "commands": [
+        {
+          "name": "ufw",
+          "usage": "ufw enable",
+          "desc": "Simple host firewall",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "iptables",
+          "usage": "iptables -L -n -v",
+          "desc": "Inspect the packet filter",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "fail2ban-client",
+          "usage": "fail2ban-client status",
+          "desc": "Brute-force protection status",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "sysctl",
+          "usage": "sysctl -a",
+          "desc": "Read kernel runtime parameters",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "aa-enforce",
+          "usage": "aa-enforce /etc/apparmor.d/*",
+          "desc": "Enforce AppArmor profiles",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "unattended-upgrades",
+          "usage": "unattended-upgrade --dry-run",
+          "desc": "Apply security updates automatically",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "gui",
+      "title": "GUI tools",
+      "commands": [
+        {
+          "name": "wireshark",
+          "usage": "wireshark",
+          "desc": "Graphical packet analyser",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "burpsuite",
+          "usage": "burpsuite",
+          "desc": "Web proxy and scanner",
+          "target": "url",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "maltego",
+          "usage": "maltego",
+          "desc": "OSINT link analysis",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ghidra",
+          "usage": "ghidraRun",
+          "desc": "Reverse-engineering suite",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    }
+  ]
+}

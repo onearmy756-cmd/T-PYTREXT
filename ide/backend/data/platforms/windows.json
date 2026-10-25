@@ -1,0 +1,412 @@
+{
+  "title": "Windows",
+  "shell": "powershell",
+  "categories": [
+    {
+      "id": "recon",
+      "title": "Discovery",
+      "commands": [
+        {
+          "name": "Get-ComputerInfo",
+          "usage": "Get-ComputerInfo",
+          "desc": "Summary of host and OS details",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "systeminfo",
+          "usage": "systeminfo",
+          "desc": "Detailed host configuration",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "netstat",
+          "usage": "netstat -ano",
+          "desc": "Active connections and owning PIDs",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-Process",
+          "usage": "Get-Process",
+          "desc": "List running processes",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-Service",
+          "usage": "Get-Service",
+          "desc": "List services and state",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-LocalUser",
+          "usage": "Get-LocalUser",
+          "desc": "List local accounts",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-LocalGroupMember",
+          "usage": "Get-LocalGroupMember -Group Administrators",
+          "desc": "Members of a local group",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "ipconfig",
+          "usage": "ipconfig /all",
+          "desc": "Interface configuration",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "arp",
+          "usage": "arp -a",
+          "desc": "ARP cache entries",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "route",
+          "usage": "route print",
+          "desc": "Routing table",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "whoami",
+          "usage": "whoami /all",
+          "desc": "Current identity and privileges",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "nltest",
+          "usage": "nltest /domain_trusts",
+          "desc": "Domain trust enumeration",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-ADUser",
+          "usage": "Get-ADUser -Filter * -Properties *",
+          "desc": "Enumerate domain users",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-ADComputer",
+          "usage": "Get-ADComputer -Filter *",
+          "desc": "Enumerate domain computers",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-ADGroup",
+          "usage": "Get-ADGroup -Filter *",
+          "desc": "Enumerate domain groups",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "dsquery",
+          "usage": "dsquery user -limit 0",
+          "desc": "Directory Service query",
+          "target": "domain",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-CimInstance",
+          "usage": "Get-CimInstance Win32_OperatingSystem",
+          "desc": "WMI/CIM inventory",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "wmic",
+          "usage": "wmic product get name,version",
+          "desc": "Installed software inventory",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "net",
+          "usage": "net share",
+          "desc": "List SMB shares",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "dfir",
+      "title": "Forensics",
+      "commands": [
+        {
+          "name": "wevtutil",
+          "usage": "wevtutil qe Security /c:20 /rd:true /f:text",
+          "desc": "Query the event log",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "Get-WinEvent",
+          "usage": "Get-WinEvent -LogName Security -MaxEvents 50",
+          "desc": "Read event log records",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-EventLog",
+          "usage": "Get-EventLog -LogName System -Newest 50",
+          "desc": "Read classic event logs",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-MpThreatDetection",
+          "usage": "Get-MpThreatDetection",
+          "desc": "Defender threat detections",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "netsh",
+          "usage": "netsh advfirewall firewall show rule name=all",
+          "desc": "Inspect firewall rules",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-FileHash",
+          "usage": "Get-FileHash -Algorithm SHA256 $T",
+          "desc": "Hash a file for integrity",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-AuthenticodeSignature",
+          "usage": "Get-AuthenticodeSignature $T",
+          "desc": "Verify code-signing signature",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-Acl",
+          "usage": "Get-Acl $T | Format-List",
+          "desc": "Read access control lists",
+          "target": "file",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-ScheduledTask",
+          "usage": "Get-ScheduledTask",
+          "desc": "List scheduled tasks",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "schtasks",
+          "usage": "schtasks /query /fo LIST /v",
+          "desc": "Verbose scheduled-task listing",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "reg",
+          "usage": "reg query HKLM\\Software",
+          "desc": "Read registry keys",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-NetTCPConnection",
+          "usage": "Get-NetTCPConnection",
+          "desc": "TCP connections with owner",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-CimInstance-Process",
+          "usage": "Get-CimInstance Win32_Process",
+          "desc": "Process list with command lines",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "Audit",
+      "commands": [
+        {
+          "name": "Get-MpComputerStatus",
+          "usage": "Get-MpComputerStatus",
+          "desc": "Defender protection status",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-BitLockerVolume",
+          "usage": "Get-BitLockerVolume",
+          "desc": "Disk encryption status",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "auditpol",
+          "usage": "auditpol /get /category:*",
+          "desc": "Audit policy settings",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": false
+        },
+        {
+          "name": "Get-HotFix",
+          "usage": "Get-HotFix",
+          "desc": "Installed updates",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        },
+        {
+          "name": "Get-NetFirewallProfile",
+          "usage": "Get-NetFirewallProfile",
+          "desc": "Firewall profile state",
+          "target": "host",
+          "risk": "low",
+          "needs_root": false
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "commands": [
+        {
+          "name": "Set-MpPreference",
+          "usage": "Set-MpPreference -DisableRealtimeMonitoring $false",
+          "desc": "Configure Defender",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "New-NetFirewallRule",
+          "usage": "New-NetFirewallRule -DisplayName 'Block 23' -Direction Inbound -LocalPort 23 -Protocol TCP -Action Block",
+          "desc": "Add a firewall rule",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "Set-ExecutionPolicy",
+          "usage": "Set-ExecutionPolicy RemoteSigned -Scope LocalMachine",
+          "desc": "Set PowerShell execution policy",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        },
+        {
+          "name": "Enable-BitLocker",
+          "usage": "Enable-BitLocker -MountPoint C: -EncryptionMethod XtsAes256",
+          "desc": "Enable disk encryption",
+          "target": "host",
+          "risk": "medium",
+          "needs_root": true
+        }
+      ]
+    },
+    {
+      "id": "exploit",
+      "title": "Exploitation",
+      "commands": [
+        {
+          "name": "Invoke-Mimikatz",
+          "usage": "Invoke-Mimikatz -DumpCreds",
+          "desc": "Dump credentials in memory",
+          "target": "host",
+          "risk": "high",
+          "needs_root": true
+        },
+        {
+          "name": "PowerView",
+          "usage": "Get-NetDomain",
+          "desc": "AD reconnaissance with PowerView",
+          "target": "domain",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "SharpHound",
+          "usage": "SharpHound.exe -c All",
+          "desc": "BloodHound data collection",
+          "target": "domain",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "Rubeus",
+          "usage": "Rubeus.exe kerberoast",
+          "desc": "Kerberos attacks",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "winPEAS",
+          "usage": "winPEASx64.exe",
+          "desc": "Local privilege-escalation checks",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        },
+        {
+          "name": "Seatbelt",
+          "usage": "Seatbelt.exe -group=all",
+          "desc": "Host security survey",
+          "target": "host",
+          "risk": "high",
+          "needs_root": false
+        }
+      ]
+    }
+  ]
+}

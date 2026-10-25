@@ -1,0 +1,23 @@
+{
+  "name": "mbilinyitech-ide",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MBILINYITECH IDE Canvas Extension App — Monaco editor + Autopilot + MTECHOS agent",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "validate": "node scripts/validate-extension.mjs ."
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "monaco-editor": "^0.52.2",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "esbuild@0.21.5": true
+  }
+}
