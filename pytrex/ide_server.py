@@ -35,6 +35,7 @@ import threading
 import time
 import traceback
 import urllib.parse
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, Optional
 
@@ -276,6 +277,10 @@ class IDEServer:
         self._thread: Optional[threading.Thread] = None
         self.started_at = time.time()
         self.requests = 0
+        # Token ya kikao inayoingizwa kwenye canvas ili iunganishe backend hii
+        # moja kwa moja. Server hii haitekelezi auth ya lazima (local), kwa
+        # hivyo token ni kwa ajili ya kuunganisha UI pekee.
+        self.session_api_key = os.environ.get("MTS_IDE_SESSION_KEY") or uuid.uuid4().hex
 
     # ---------- routing ----------
 
@@ -386,7 +391,31 @@ class IDEServer:
                     "<code>pytrex ide --start</code></p></body>")
             return {"_raw": html, "_status": 200, "_ctype": "text/html; charset=utf-8"}
         with open(os.path.join(build, "index.html"), "r", encoding="utf-8") as f:
-            return {"_raw": f.read(), "_status": 200, "_ctype": "text/html; charset=utf-8"}
+            html = f.read()
+        # Ingiza runtime config ili Canvas iunganishe backend hii MOYAMOJA
+        # (bila key, Canvas hutuonyesha skrini ya kusanidi backend).
+        injection = self._runtime_injection()
+        if injection:
+            html = html.replace("</head>", injection + "</head>", 1)
+        return {"_raw": html, "_status": 200, "_ctype": "text/html; charset=utf-8"}
+
+    def _runtime_injection(self) -> str:
+        """Tengeneza <script> ya config (kama static-server.mjs ya canvas)."""
+        key = self.session_api_key
+        base_path = "/ide"
+        parts = []
+        if key:
+            k = json.dumps(key)
+            parts.append(f"window.__AGENT_CANVAS_SESSION_API_KEY__={k};")
+            parts.append(
+                "try{var _k='mbilinyi-agent-server-config',"
+                f"_c=JSON.parse(localStorage.getItem(_k)||'{{}}');"
+                f"if(_c.sessionApiKey!=={k}){{_c.sessionApiKey={k};"
+                "localStorage.setItem(_k,JSON.stringify(_c));}}catch(e){}")
+        parts.append(f"window.__AGENT_CANVAS_BASE_PATH__={json.dumps(base_path)};")
+        parts.append(f"window.__AGENT_CANVAS_VSCODE_BASE_PATH__={json.dumps(base_path + '/vscode')};")
+        parts.append("window.__AGENT_CANVAS_DO_NOT_TRACK__=true;")
+        return "<script>(function(){" + "".join(parts) + "})();</script>"
 
     def _serve_canvas_asset(self, rel: str) -> dict:
         build = self._canvas_build_dir()
@@ -418,6 +447,8 @@ class IDEServer:
                 query = dict(urllib.parse.parse_qsl(parsed.query))
                 length = int(self.headers.get("Content-Length", 0) or 0)
                 body = self.rfile.read(length).decode("utf-8") if length else ""
+                if os.environ.get("MTS_IDE_ACCESS_LOG"):
+                    print(f"[ide] {method} {parsed.path}", flush=True)
                 try:
                     result = server._route(method, parsed.path, query, body)
                 except Exception as e:  # noqa: BLE001

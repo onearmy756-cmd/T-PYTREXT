@@ -75,10 +75,23 @@ GET  /api/conversations/{id}          → info
 GET  /api/conversations/{id}/events   → event log
 POST /api/conversations/{id}/events   → tuma ujumbe + endesha agent
 WS   /sockets/events/{id}             → mtiririko wa events (live)
+GET  /api/profiles                    → profiles za LLM (settings ya canvas)
+GET  /api/meta-profiles               → meta-profiles (model routing)
+GET  /api/settings/agent-schema       → JSON schema ya settings
+GET  /api/automation/sdk-version      → toleo la SDK (canvas husoma)
+GET  /api/llm/models                  → orodha ya models (canvas dropdown)
 ```
+
+## Kuunganisha Canvas
+
+`GET /ide` huingiza `<script>` ya runtime config kwenye `<head>`: token ya
+kikao (`__AGENT_CANVAS_SESSION_API_KEY__`), base path (`/ide`) na telemetry
+imezimwa. Canvas husoma token hii na **hujiunganisha yenyewe** na backend —
+mtumiaji hahitaji kuandika host/key. Token ni ya kikao hiki pekee
+(`MTS_IDE_SESSION_KEY` ya env, au nasibu).
 
 ## Tests
 
 ```bash
-python -m pytest tests/test_ide.py -q      # 34 tests
+python -m pytest tests/test_ide.py -q      # 38 tests
 ```

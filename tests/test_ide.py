@@ -218,11 +218,40 @@ class TestAgentServerProtocol:
         st, _ = _http(8137, "/nope")
         assert st == 404
 
+    def test_canvas_settings_routes(self, server):
+        # Routes hizi Canvas huziita kwenye kupakia; zote lazima zijibu 200.
+        for path in ("/api/profiles", "/api/meta-profiles",
+                     "/api/automation/sdk-version", "/api/llm/models/verified",
+                     "/api/llm/models", "/api/settings/agent-schema",
+                     "/api/agent-profiles"):
+            st, body = _http(8137, path)
+            assert st == 200, path
+            assert isinstance(body, dict), path
+
+    def test_profiles_route_shape(self, server):
+        st, body = _http(8137, "/api/profiles")
+        assert "profiles" in body and "active_profile" in body
+        assert isinstance(body["profiles"], list)
+
+    def test_llm_models_route_shape(self, server):
+        st, body = _http(8137, "/api/llm/models")
+        assert isinstance(body["models"], list) and body["models"]
+
 
 class TestCanvasServing:
     def test_ide_html(self, server):
         st, _ = _http(8137, "/ide")
         assert st == 200
+
+    def test_ide_injects_runtime_config(self, server):
+        # Canvas hupata token ya kikao ili iunganishe backend MOYAMOJA —
+        # bila hii mtumiaji hukutana na skrini ya kusanidi.
+        url = "http://127.0.0.1:8137/ide"
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            html = resp.read().decode()
+        assert "__AGENT_CANVAS_SESSION_API_KEY__" in html
+        assert "__AGENT_CANVAS_BASE_PATH__" in html
+        assert server.session_api_key in html
 
     def test_ide_asset(self, server):
         # index.html references /ide/assets/... — huthibitisha assets zinafika.

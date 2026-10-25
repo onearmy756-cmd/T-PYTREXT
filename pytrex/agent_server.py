@@ -457,7 +457,27 @@ class AgentServer(IDEServer):
             return self._settings_payload()
         if path == "/api/v1/settings/profiles" or path == "/api/agent-profiles":
             return {"profiles": [], "items": []}
-        if path == "/api/v1/settings/conversation-schema" or path == "/api/v1/settings/agent-schema":
+        if path == "/api/profiles":
+            return self._profiles_payload()
+        if path.startswith("/api/profiles/"):
+            return self._profile_route(method, path, body)
+        if path == "/api/meta-profiles":
+            return {"meta_profiles": [], "active_meta_profile": None}
+        if path.startswith("/api/meta-profiles/"):
+            return {"status": "ok", "message": "meta-profile saved", "name": path.rsplit("/", 1)[-1]}
+        if path == "/api/automation/sdk-version":
+            return {"sdk_version": SDK_VERSION}
+        if path == "/api/llm/models/verified":
+            return {"models": {}}
+        if path == "/api/llm/models":
+            return {"models": ["openai/gpt-4o-mini", "openai/gpt-4o",
+                               "anthropic/claude-sonnet-4-5-20250929",
+                               "anthropic/claude-haiku-4-5-20251001"]}
+        if path == "/api/llm/providers":
+            return {"providers": []}
+        if path == "/api/settings/agent-schema" or path == "/api/v1/settings/agent-schema":
+            return self._agent_schema()
+        if path == "/api/v1/settings/conversation-schema":
             return {"type": "object", "properties": {}}
         if path == "/api/v1/web-client/config":
             return {"app_mode": "local", "feature_flags": {}}
@@ -581,6 +601,59 @@ class AgentServer(IDEServer):
             "conversation_settings": {"max_iterations": self.runtime.max_iterations},
             "llm_api_key_is_set": bool(self.llm_config.get("api_key")),
             "misc_settings": {"app_preferences": {}},
+        }
+
+    # ---------- LLM profiles (canvas settings) ----------
+
+    def _profiles_payload(self) -> dict:
+        """Orodha ya profiles — moja ya 'default' inayotokana na llm_config."""
+        name = self.llm_config.get("model") or "default"
+        profile = {
+            "name": name,
+            "model": self.llm_config.get("model", ""),
+            "base_url": self.llm_config.get("base_url") or None,
+            "api_key_set": bool(self.llm_config.get("api_key")),
+            "provider_connection_id": None,
+            "provider_connection_broken": False,
+        }
+        return {"profiles": [profile], "active_profile": name}
+
+    def _profile_route(self, method: str, path: str, body: str) -> dict:
+        name = path[len("/api/profiles/"):].split("/")[0]
+        tail = path[len("/api/profiles/"):].split("/")[1:]
+        if tail == ["activate"]:
+            return {"status": "ok", "message": f"activated {name}", "name": name}
+        if tail == ["validate"]:
+            return {"valid": bool(self.llm_config.get("api_key")),
+                    "error": None if self.llm_config.get("api_key")
+                    else {"type": "missing_api_key", "message": "LLM key not set"}}
+        if method == "GET":
+            return {"name": name, "model": self.llm_config.get("model", ""),
+                    "base_url": self.llm_config.get("base_url") or None,
+                    "api_key_set": bool(self.llm_config.get("api_key")),
+                    "llm": {"model": self.llm_config.get("model", "")}}
+        if method == "DELETE":
+            return {"status": "ok", "message": f"deleted {name}", "name": name}
+        # POST/PUT: hifadhi profile
+        payload = self._json(body)
+        llm = payload.get("llm") or {}
+        if llm.get("model"):
+            self.llm_config["model"] = llm["model"]
+        if llm.get("base_url"):
+            self.llm_config["base_url"] = llm["base_url"]
+        if payload.get("include_secrets") and llm.get("api_key"):
+            self.llm_config["api_key"] = llm["api_key"]
+        return {"status": "ok", "message": f"saved {name}", "name": name}
+
+    def _agent_schema(self) -> dict:
+        """JSON schema ndogo ya settings za agent (kwa UI ya canvas)."""
+        return {
+            "type": "object",
+            "properties": {
+                "llm_model": {"type": "string", "title": "LLM Model"},
+                "llm_base_url": {"type": "string", "title": "Base URL"},
+                "confirmation_mode": {"type": "boolean", "title": "Confirmation Mode"},
+            },
         }
 
     def _skills_payload(self) -> dict:
