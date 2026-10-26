@@ -124,6 +124,12 @@ class EditorServer:
         if self.token:
             cmd += ["--connection-token", self.token]
 
+        # Editor ya kikao kilichopita inaweza kuwa bado imeshikilia port yetu
+        # (token yake ni ya zamani). Bila kuisafisha, mchakato wetu hushindwa
+        # ku-bind, `_port_open()` hurudisha true kwa sababu MTU MWINGINE
+        # anasikiliza, na kila ombi hupata 403 kimyakimya.
+        self._free_port()
+
         env = dict(os.environ)
         env["VSCODE_TELEMETRY_LEVEL"] = "off"
         logf = open(self._log_path, "ab")
@@ -140,7 +146,9 @@ class EditorServer:
                 self._last_error = "editor ilikwama — angalia mts-editor.log"
                 return {"status": "error", "message": self._last_error,
                         "log": self._log_path}
-            if self._port_open():
+            # Sio kutosha port kufunguka — LAZIMA iwe mchakato wetu. Vinginevyo
+            # tunatangaza mafanikio huku editor ya zamani ikikataa token yetu.
+            if self._port_owned_by_us():
                 return {"status": "ok", "message": f"editor inaendesha (port {self.port})",
                         "url": f"{self.base_path}?tkn={self.token}" if self.token else self.base_path}
             time.sleep(0.5)
@@ -170,6 +178,106 @@ class EditorServer:
                 return True
         except OSError:
             return False
+
+    def _port_owned_by_us(self) -> bool:
+        """Port inasikilizwa NA mchakato wetu (sio mchakato mwingine).
+
+        `_port_open()` pekee haitoshi: editor ya kikao kilichopita inaweza
+        kushikilia port hiyo na token tofauti, hivyo maombi yetu yote yanapata
+        403 wakati `status()` inasema `running: true`.
+        """
+        if not self.running or not self._port_open():
+            return False
+        assert self._proc is not None
+        return self._listening_pids(self.port) <= self._proc_tree_pids()
+
+    def _proc_tree_pids(self) -> set:
+        """PID za mchakato wetu pamoja na watoto wake (node, extension host…)."""
+        assert self._proc is not None
+        root = self._proc.pid
+        pids = {root}
+        try:
+            entries = os.listdir("/proc")
+        except OSError:
+            return pids
+        children = {}
+        for name in entries:
+            if not name.isdigit():
+                continue
+            try:
+                with open(f"/proc/{name}/stat", "rb") as f:
+                    fields = f.read().rsplit(b")", 1)[1].split()
+                children.setdefault(int(fields[1]), []).append(int(name))
+            except (OSError, IndexError, ValueError):
+                continue
+        stack = [root]
+        while stack:
+            for child in children.get(stack.pop(), []):
+                if child not in pids:
+                    pids.add(child)
+                    stack.append(child)
+        return pids
+
+    def _listening_pids(self, port: int) -> set:
+        """PID zinazosikiliza `port` kwenye TCP (inode → /proc/<pid>/fd)."""
+        inodes = set()
+        for path in ("/proc/net/tcp", "/proc/net/tcp6"):
+            try:
+                with open(path) as f:
+                    next(f, None)
+                    for line in f:
+                        parts = line.split()
+                        if len(parts) < 10 or parts[3] != "0A":  # 0A = LISTEN
+                            continue
+                        if int(parts[1].split(":")[1], 16) == port:
+                            inodes.add(parts[9])
+            except (OSError, ValueError, IndexError):
+                continue
+        if not inodes:
+            return set()
+        pids = set()
+        try:
+            entries = os.listdir("/proc")
+        except OSError:
+            return pids
+        for name in entries:
+            if not name.isdigit():
+                continue
+            fd_dir = f"/proc/{name}/fd"
+            try:
+                fds = os.listdir(fd_dir)
+            except OSError:
+                continue
+            for fd in fds:
+                try:
+                    target = os.readlink(os.path.join(fd_dir, fd))
+                except OSError:
+                    continue
+                if target.startswith("socket:[") and target[8:-1] in inodes:
+                    pids.add(int(name))
+                    break
+        return pids
+
+    def _free_port(self) -> None:
+        """Zima msikilizaji yeyote wa zamani kwenye port yetu (na watoto wake)."""
+        for pid in self._listening_pids(self.port):
+            if pid == os.getpid():
+                continue
+            try:
+                os.kill(pid, 15)
+            except OSError:
+                continue
+        deadline = time.time() + 8.0
+        while time.time() < deadline and self._port_open():
+            time.sleep(0.25)
+        if self._port_open():
+            for pid in self._listening_pids(self.port):
+                if pid != os.getpid():
+                    try:
+                        os.kill(pid, 9)
+                    except OSError:
+                        pass
+            time.sleep(0.5)
 
     def url(self, base_url: str) -> Optional[str]:
         """URL ya editor inayotumika kwenye kivinjari (kupitia proxy yetu)."""

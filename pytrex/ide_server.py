@@ -42,7 +42,7 @@ import traceback
 import urllib.parse
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .core import (
     TerminalEmulator, CodeEditor, Linter, CodeFormatter, TypeChecker,
@@ -299,6 +299,9 @@ class IDEServer:
         )
         self.editor_base_path = self.editor.base_path
         self.editor_upstream = ("127.0.0.1", self.editor.port)
+        self._compress_cache: Dict[Tuple[str, int], bytes] = {}
+        self._compress_cache_bytes = 0
+        self._cache_lock = threading.Lock()
 
     # ---------- routing ----------
 
@@ -632,6 +635,10 @@ class IDEServer:
             lk = k.lower()
             if lk in hop or lk == "cookie":
                 continue
+            # Tunaomba identity kwa upstream na kufunga gzip sisi wenyewe
+            # (upstream haifanyi compression; workbench.js ni 13 MB).
+            if lk == "accept-encoding":
+                continue
             fwd[k] = v
         fwd["Host"] = handler.headers.get("Host", f"127.0.0.1:{self.editor.port}")
         cookie_hdr = handler.headers.get("Cookie", "")
@@ -653,10 +660,13 @@ class IDEServer:
             conn.request(method, req_path, body=body or None, headers=fwd)
             resp = conn.getresponse()
             payload = resp.read()
+            headers = [(k, v) for k, v in resp.getheaders()
+                       if k.lower() not in hop and k.lower() not in ("server", "date")]
+            payload, headers = self._maybe_compress(
+                handler, method, req_path, payload, headers
+            )
             handler.send_response(resp.status)
-            for k, v in resp.getheaders():
-                if k.lower() in hop:
-                    continue
+            for k, v in headers:
                 handler.send_header(k, v)
             handler.send_header("Content-Length", str(len(payload)))
             handler.end_headers()
@@ -674,6 +684,55 @@ class IDEServer:
                 conn.close()
             except OSError:
                 pass
+
+    # ---------- compression ----------
+
+    _COMPRESSIBLE = (".js", ".css", ".json", ".html", ".svg", ".map", ".txt",
+                     ".md", ".xml", ".ttf")
+    _CACHE_MAX_BYTES = 64 * 1024 * 1024
+
+    def _maybe_compress(self, handler, method: str, req_path: str,
+                        payload: bytes,
+                        headers: List[Tuple[str, str]]) -> Tuple[bytes, List[Tuple[str, str]]]:
+        """Gzip payload kubwa inayoweza kubanwa (workbench.js ni 13 MB).
+
+        Upstream haifanyi compression, kwa hivyo kivinjari hupakua bundle
+        kamili. Tunabanwa hapa na kuhifadhi matokeo kwenye cache — gharama ya
+        gzip hulipwa mara moja tu kwa kila toleo la asset.
+        """
+        if method == "HEAD" or len(payload) < 1024:
+            return payload, headers
+        if handler.headers.get("Accept-Encoding", "").lower().find("gzip") < 0:
+            return payload, headers
+        if any(k.lower() == "content-encoding" for k, _ in headers):
+            return payload, headers
+        ctype = next((v for k, v in headers if k.lower() == "content-type"), "")
+        path_only = req_path.split("?", 1)[0].lower()
+        if not (path_only.endswith(self._COMPRESSIBLE)
+                or any(t in ctype for t in ("javascript", "text/", "json",
+                                            "svg", "xml"))):
+            return payload, headers
+
+        import gzip as _gzip
+
+        key = (path_only, len(payload))
+        with self._cache_lock:
+            hit = self._compress_cache.get(key)
+        if hit is None:
+            hit = _gzip.compress(payload, 6)
+            with self._cache_lock:
+                if self._compress_cache_bytes + len(hit) <= self._CACHE_MAX_BYTES:
+                    self._compress_cache[key] = hit
+                    self._compress_cache_bytes += len(hit)
+        if len(hit) >= len(payload):
+            return payload, headers
+
+        out = [(k, v) for k, v in headers
+               if k.lower() not in ("content-length", "content-encoding")]
+        out.append(("Content-Encoding", "gzip"))
+        out.append(("Vary", "Accept-Encoding"))
+        return hit, out
+
 
     # ---------- server ----------
 

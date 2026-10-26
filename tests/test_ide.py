@@ -6,6 +6,7 @@ inaendesha tool halisi. Hakuna mocks kwa zana; LLM pekee ndiyo inasimulika
 """
 import json
 import os
+import sys
 import time
 import urllib.request
 import urllib.error
@@ -299,6 +300,9 @@ class TestCanvasServing:
 class _FakeProc:
     """Proc bandia: `poll()` hurudisha None → editor "inaendesha"."""
 
+    def __init__(self, pid=None):
+        self.pid = pid if pid is not None else os.getpid()
+
     def poll(self):
         return None
 
@@ -307,6 +311,103 @@ class _FakeProc:
 
     def wait(self, timeout=None):
         return 0
+
+
+class TestEditorPortOwnership:
+    """Editor ya kikao kilichopita haipaswi kuonekana kama "yetu".
+
+    Bug halisi: editor ya zamani ilishikilia port 8001 kwa token tofauti.
+    `start()` iliona port imefunguka (`_port_open()`), ikatangaza
+    `running: true`, na kila ombi likapata 403. Port LAZIMA iwe ya mchakato
+    wetu, na msikilizaji wa zamani lazima azimwe kabla ya kuzindua mpya.
+    """
+
+    @staticmethod
+    def _spawn_listener():
+        """Server halisi wa HTTP kama mchakato tofauti (kama editor ya zamani)."""
+        import socket as _socket
+        import subprocess as _sp
+
+        with _socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            port = s.getsockname()[1]
+        proc = _sp.Popen(
+            [sys.executable, "-m", "http.server", str(port), "--bind", "127.0.0.1"],
+            stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
+        )
+        deadline = time.time() + 15
+        while time.time() < deadline:
+            try:
+                with _socket.create_connection(("127.0.0.1", port), timeout=0.5):
+                    return proc, port
+            except OSError:
+                if proc.poll() is not None:
+                    raise RuntimeError("listener alikufa mapema")
+                time.sleep(0.2)
+        proc.kill()
+        raise RuntimeError("listener hakufunguka")
+
+    def test_listening_pids_finds_the_real_listener(self):
+        from pytrex.editor import EditorServer
+
+        proc, port = self._spawn_listener()
+        try:
+            ed = EditorServer(workspace=".", port=port, binary="/bin/true")
+            assert proc.pid in ed._listening_pids(port)
+        finally:
+            proc.kill()
+            proc.wait(timeout=10)
+
+    def test_port_is_not_owned_by_us_when_someone_else_listens(self):
+        import subprocess as _sp
+
+        from pytrex.editor import EditorServer
+
+        proc, port = self._spawn_listener()
+        # "Mchakato wetu" ni sleeper tofauti — sio babu wa listener.
+        mine = _sp.Popen(["/bin/sh", "-c", "sleep 30; true"], stdin=_sp.DEVNULL)
+        try:
+            ed = EditorServer(workspace=".", port=port, binary="/bin/true")
+            ed._proc = _FakeProc(pid=mine.pid)
+            assert ed._port_open() is True
+            assert ed._port_owned_by_us() is False
+        finally:
+            proc.kill()
+            proc.wait(timeout=10)
+            mine.kill()
+            mine.wait(timeout=10)
+
+    def test_free_port_kills_stale_listener(self):
+        from pytrex.editor import EditorServer
+
+        proc, port = self._spawn_listener()
+        ed = EditorServer(workspace=".", port=port, binary="/bin/true")
+        ed._free_port()
+        assert ed._port_open() is False
+        proc.wait(timeout=10)
+
+    def test_proc_tree_includes_children(self):
+        import subprocess as _sp
+
+        from pytrex.editor import EditorServer
+
+        # `; true` huzuia `sh` kujibadilisha na `sleep` (exec), ili tuwe na mtoto.
+        proc = _sp.Popen(["/bin/sh", "-c", "sleep 30; true"], stdin=_sp.DEVNULL)
+        try:
+            ed = EditorServer(workspace=".", binary="/bin/true")
+            ed._proc = _FakeProc(pid=proc.pid)
+            deadline = time.time() + 15
+            tree = {proc.pid}
+            while time.time() < deadline:
+                tree = ed._proc_tree_pids()
+                if len(tree) >= 2:
+                    break
+                time.sleep(0.3)
+            assert proc.pid in tree
+            assert len(tree) >= 2, f"mtoto wa sh haonekani: {tree}"
+        finally:
+            proc.kill()
+            proc.wait(timeout=10)
 
 
 class TestEditorProxyFraming:
@@ -349,6 +450,7 @@ class TestEditorProxyFraming:
         server.editor_upstream = ("127.0.0.1", port)
 
     def test_proxy_strips_hop_by_hop_and_sets_length(self, server):
+        import gzip as _gzip
         import http.client as _httpclient
 
         up, port = self._upstream()
@@ -363,8 +465,51 @@ class TestEditorProxyFraming:
             assert resp.getheader("Transfer-Encoding") is None
             assert resp.getheader("Connection") is None
             assert int(resp.getheader("Content-Length")) == len(body)
+            # Upstream haina compression, kwa hivyo proxy inabanwa yenyewe.
+            assert resp.getheader("Content-Encoding") == "gzip"
+            assert b"editor asset" in _gzip.decompress(body)
+            conn.close()
+        finally:
+            up.shutdown()
+
+    def test_proxy_serves_identity_when_client_cannot_gzip(self, server):
+        """Mteja asiyeomba gzip hupata bytes mbichi (hakuna Content-Encoding)."""
+        import http.client as _httpclient
+
+        up, port = self._upstream()
+        try:
+            self._point_at(server, port)
+            conn = _httpclient.HTTPConnection("127.0.0.1", 8137, timeout=10)
+            conn.request("GET", "/ide/vscode/static/out/x.js",
+                         headers={"Host": "example.test", "Accept-Encoding": "identity"})
+            resp = conn.getresponse()
+            body = resp.read()
+            assert resp.status == 200
+            assert resp.getheader("Content-Encoding") is None
+            assert int(resp.getheader("Content-Length")) == len(body)
             assert b"editor asset" in body
             conn.close()
+        finally:
+            up.shutdown()
+
+    def test_proxy_gzip_cache_is_reused(self, server):
+        """Gzip ya asset moja hufanyika mara moja, kisha hutolewa kwenye cache."""
+        import http.client as _httpclient
+
+        up, port = self._upstream()
+        try:
+            self._point_at(server, port)
+            sizes = []
+            for _ in range(2):
+                conn = _httpclient.HTTPConnection("127.0.0.1", 8137, timeout=10)
+                conn.request("GET", "/ide/vscode/static/out/x.js",
+                             headers={"Host": "example.test",
+                                      "Accept-Encoding": "gzip"})
+                resp = conn.getresponse()
+                sizes.append(len(resp.read()))
+                conn.close()
+            assert sizes[0] == sizes[1]
+            assert len(server._compress_cache) == 1
         finally:
             up.shutdown()
 
