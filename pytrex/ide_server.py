@@ -55,6 +55,15 @@ from .core import (
 from .search_engine import SearchEngine as WebSearchEngine
 from .ide import IDEEngine, IDEToolRegistry, ide_home
 from .editor import EditorServer, DEFAULT_EDITOR_PORT
+from . import sdlc as _sdlc
+from .ide_tools import IDETools
+
+# Zana zinazopatikana kwa IDETools.dispatch (endpoints za /api/ide/*)
+_IDE_TOOL_NAMES = {
+    "lsp", "dap", "complete", "composer", "build", "pipeline", "testkit",
+    "e2e", "lab", "devices", "emulators", "swarm", "engineer", "integrations",
+    "audit", "autopilot", "sdlc",
+}
 
 IDE_SERVER_VERSION = "1.0.0"
 
@@ -283,6 +292,11 @@ class IDEServer:
         self.workspace = os.path.abspath(workspace)
         self.engine = IDEEngine(home=home)
         self.bridge = ToolBridge(self.workspace)
+        # Miradi inayozalishwa (SDLC/Autopilot/Swarm) huandikwa kwenye `projects/`
+        self.projects_dir = os.path.join(self.workspace, "projects")
+        self.sdlc = _sdlc.SDLCStore(os.path.join(self.workspace, ".pytrex", "sdlc.json"))
+        self.sdlc_engine = _sdlc.SDLCEngine(self.projects_dir, self.sdlc, self.bridge)
+        self.tools = IDETools(self.projects_dir, self.sdlc_engine, self.bridge)
         self._httpd: Optional[ThreadingHTTPServer] = None
         self._thread: Optional[threading.Thread] = None
         self.started_at = time.time()
@@ -354,6 +368,43 @@ class IDEServer:
             self.bridge.audit.log("ide", f"tool:{tool}", path)
             return {"ok": result.get("status") != "error", "data": result}
 
+        # ---- IDE tool endpoints (lsp, dap, composer, sdlc, autopilot, …) ----
+        if path.startswith("/api/ide/") and path != "/api/ide/tools":
+            rest = path[len("/api/ide/"):].strip("/")
+            parts = [p for p in rest.split("/") if p]
+            tool = parts[0] if parts else ""
+            sub = parts[1] if len(parts) > 1 else ""
+            alias = {"device": "devices", "emulate": "emulators",
+                     "code": "audit", "test": "testkit", "edit": "complete"}
+            tool = alias.get(tool, tool)
+            if tool in _IDE_TOOL_NAMES:
+                payload = self._json(body)
+                action = sub or payload.get("action") or self._query_action(query)
+                if action:
+                    payload["action"] = action
+                result = self.tools.dispatch(tool, payload)
+                self.bridge.audit.log("ide", f"tool:{tool}", path)
+                if result.get("ok") is False and "error" in result:
+                    return {"ok": False, "data": result, "error": result["error"]}
+                return {"ok": True, "data": result}
+
+        # ---- SDLC (top-level routes) ----
+        if path.startswith("/api/sdlc"):
+            payload = self._json(body)
+            action = path.rsplit("/", 1)[-1]
+            if action not in ("capabilities", "assess", "plan", "run", "gate",
+                              "continue", "history"):
+                return {"_status": 404, "_ctype": "application/json",
+                        "_raw": json.dumps({"ok": False, "error": "sdlc route haipo"})}
+            result = self.tools.dispatch("sdlc", {**payload, "action": action})
+            return {"ok": result.get("ok", True), "data": result}
+
+        # ---- autopilot (top-level) ----
+        if path in ("/api/autopilot", "/api/autopilot/run") and method == "POST":
+            return {"ok": True, "data": self.tools.dispatch("autopilot", self._json(body))}
+        if path == "/api/autopilot/status":
+            return {"ok": True, "data": self.tools.dispatch("autopilot", {"action": "status"})}
+
         # ---- editor shortcuts (kasi) ----
         if path == "/api/ide/file" and method == "GET":
             p = os.path.join(self.workspace, query.get("path", ""))
@@ -389,6 +440,11 @@ class IDEServer:
             return data if isinstance(data, dict) else {}
         except json.JSONDecodeError:
             return {}
+
+    @staticmethod
+    def _query_action(query: dict) -> str:
+        """Toa `action` kutoka query string (au path ya mwisho)."""
+        return (query.get("action") or query.get("op") or "").strip()
 
     def _tree(self, rel: str = ".") -> dict:
         base = os.path.normpath(os.path.join(self.workspace, rel))
@@ -762,6 +818,9 @@ class IDEServer:
                 self._respond(result)
 
             def _respond(self, result: dict):
+                if result.get("_sse"):
+                    self._respond_sse(result)
+                    return
                 if "_raw" in result:
                     payload = result["_raw"]
                     if isinstance(payload, str):
@@ -779,6 +838,27 @@ class IDEServer:
                 self.send_header("Content-Length", str(len(payload)))
                 self.end_headers()
                 self.wfile.write(payload)
+
+            def _respond_sse(self, result: dict):
+                """Tuma SSE stream (text/event-stream) halisi."""
+                events = result.get("_sse_events") or []
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Cache-Control", "no-cache")
+                self.send_header("Connection", "close")
+                self.send_header("X-Accel-Buffering", "no")
+                self.end_headers()
+                try:
+                    for ev in events:
+                        name = ev.get("event", "message")
+                        data = json.dumps(ev.get("data", {}), default=str)
+                        chunk = f"event: {name}\ndata: {data}\n\n".encode("utf-8")
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
+                    self.wfile.write(b"event: done\ndata: {}\n\n")
+                    self.wfile.flush()
+                except (BrokenPipeError, ConnectionResetError, OSError):
+                    pass
 
             def do_GET(self):
                 self._dispatch("GET")

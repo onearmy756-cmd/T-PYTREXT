@@ -138,10 +138,22 @@ class IDEToolRegistry:
         return seen
 
     def catalog(self) -> dict:
+        implemented = {
+            "api", "lsp", "dap", "complete", "composer", "build", "pipeline",
+            "testkit", "e2e", "lab", "emulators", "devices", "swarm", "engineer",
+            "integrations", "code_run", "canvas",
+        }
+        tools = []
+        for t in self._tools.values():
+            d = t.to_dict()
+            d["implemented"] = t.name in implemented
+            d["status"] = "ok" if t.name in implemented else "unavailable"
+            tools.append(d)
         return {
             "total": len(self._tools),
+            "implemented": sum(1 for t in self._tools.values() if t.name in implemented),
             "categories": self.categories(),
-            "tools": [t.to_dict() for t in self._tools.values()],
+            "tools": tools,
         }
 
 

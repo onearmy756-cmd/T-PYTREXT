@@ -46,7 +46,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, List, Optional
 
 from .ide import IDEEngine
-from .ide_server import IDEServer, ToolBridge
+from .ide_server import IDEServer, ToolBridge, _IDE_TOOL_NAMES
+from .canvas_services import CanvasServices
 
 AGENT_SERVER_VERSION = "1.51.0"   # inatosheleza minVersion ya canvas (config/defaults.json)
 SDK_VERSION = "1.51.0"
@@ -272,14 +273,172 @@ _TOOL_SCHEMAS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "think",
+            "description": "Record an internal reasoning note. Use to plan before acting.",
+            "parameters": {"type": "object",
+                           "properties": {"thought": {"type": "string"}},
+                           "required": ["thought"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "task_tracker",
+            "description": "Plan and track a multi-step task as a checklist.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "command": {"type": "string", "enum": ["view", "plan"]},
+                    "task_list": {"type": "array", "items": {"type": "object",
+                        "properties": {"title": {"type": "string"},
+                                       "status": {"type": "string",
+                                                  "enum": ["todo", "in_progress", "done"]}},
+                        "required": ["title", "status"]}},
+                },
+                "required": ["command"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "glob",
+            "description": "Find files by glob pattern (e.g. '**/*.py') in the workspace.",
+            "parameters": {"type": "object",
+                           "properties": {"pattern": {"type": "string"},
+                                          "path": {"type": "string"}},
+                           "required": ["pattern"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "grep",
+            "description": "Search file contents with a regular expression.",
+            "parameters": {"type": "object",
+                           "properties": {"pattern": {"type": "string"},
+                                          "path": {"type": "string"},
+                                          "glob": {"type": "string"}},
+                           "required": ["pattern"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "str_replace",
+            "description": "Replace an exact string in a file (edit). Fails if not unique.",
+            "parameters": {"type": "object",
+                           "properties": {"path": {"type": "string"},
+                                          "old_str": {"type": "string"},
+                                          "new_str": {"type": "string"}},
+                           "required": ["path", "old_str", "new_str"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "fetch_url",
+            "description": "Fetch the text content of a URL (HTTP GET).",
+            "parameters": {"type": "object",
+                           "properties": {"url": {"type": "string"}},
+                           "required": ["url"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "code_audit",
+            "description": "Scan the workspace or a path for security/bug/quality findings.",
+            "parameters": {"type": "object",
+                           "properties": {"path": {"type": "string"}}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_tests",
+            "description": "Run the project's tests (pytest/unittest) and return the summary.",
+            "parameters": {"type": "object",
+                           "properties": {"path": {"type": "string"}}},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "sdlc",
+            "description": "Run the full SDLC lifecycle for a spec (requirements → design → "
+                           "build → verify → deploy → monitor). Writes REAL files.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "action": {"type": "string",
+                               "enum": ["capabilities", "assess", "plan", "run", "history"]},
+                    "spec": {"type": "string"}, "kind": {"type": "string"},
+                    "write": {"type": "boolean"},
+                },
+                "required": ["action"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "autopilot",
+            "description": "Run the Autopilot pipeline (plan → scaffold → review → report) "
+                           "to generate a project from an idea.",
+            "parameters": {"type": "object",
+                           "properties": {"idea": {"type": "string"},
+                                          "kind": {"type": "string"}},
+                           "required": ["idea"]},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "git",
+            "description": "Git operations in the workspace (status, diff, log, commit).",
+            "parameters": {
+                "type": "object",
+                "properties": {"action": {"type": "string",
+                                          "enum": ["status", "diff", "log", "commit"]},
+                               "message": {"type": "string"},
+                               "limit": {"type": "integer"}},
+                "required": ["action"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_skills",
+            "description": "List available skills in the workspace skill library.",
+            "parameters": {"type": "object",
+                           "properties": {"query": {"type": "string"}}},
+        },
+    },
 ]
 
 SYSTEM_PROMPT = (
     "You are MBILINYI IDE, an autonomous coding agent running inside the "
-    "T-PYTREXT framework. You have real tools: run_bash (a real shell in the "
-    "workspace), read_file, write_file, list_files, lint_code, format_code. "
-    "Use them to inspect and change real files. Be concise. When the task is "
-    "done, reply with a short summary and no further tool calls."
+    "T-PYTREXT framework. You have real tools and you must use them to inspect "
+    "and change real files, never guess:\n"
+    "  - run_bash: a real shell in the workspace\n"
+    "  - read_file / write_file / list_files / str_replace: file work\n"
+    "  - glob / grep: find files and search contents\n"
+    "  - lint_code / format_code: quality\n"
+    "  - code_audit: security/bug scan (returns grade + findings)\n"
+    "  - run_tests: run the project's test suite\n"
+    "  - sdlc: full lifecycle (requirements → design → build → verify → deploy → monitor)\n"
+    "  - autopilot: generate a project from an idea\n"
+    "  - git: status/diff/log/commit\n"
+    "  - fetch_url: read a web page\n"
+    "  - think / task_tracker: plan multi-step work\n"
+    "Plan with task_tracker for multi-step work. Verify your changes (run_tests, "
+    "code_audit) before claiming success. Be concise. When the task is done, "
+    "reply with a short summary and no further tool calls."
 )
 
 
@@ -292,6 +451,8 @@ class AgentRuntime:
         self.bridge = bridge
         self.llm_config = llm_config
         self.max_iterations = max_iterations
+        self._tasks: List[dict] = []
+        self._tools = None
 
     # ---------- LLM ----------
 
@@ -348,7 +509,169 @@ class AgentRuntime:
         if name == "format_code":
             r = self.bridge.formatter.format(args.get("code", ""), args.get("language", "python"))
             return {"kind": "FormatObservation", "content": r.get("formatted", "")}
+        if name == "think":
+            return {"kind": "ThinkObservation", "content": args.get("thought", "")}
+        if name == "task_tracker":
+            if args.get("command") == "view":
+                return {"kind": "TaskObservation",
+                        "content": json.dumps(self._tasks)}
+            self._tasks = args.get("task_list", [])
+            return {"kind": "TaskObservation",
+                    "content": json.dumps({"updated": len(self._tasks)})}
+        if name == "glob":
+            return {"kind": "GlobObservation",
+                    "content": json.dumps(self._glob(args.get("pattern", ""),
+                                                     args.get("path", "")))}
+        if name == "grep":
+            return {"kind": "GrepObservation",
+                    "content": json.dumps(self._grep(args.get("pattern", ""),
+                                                     args.get("path", ""),
+                                                     args.get("glob", "")))}
+        if name == "str_replace":
+            return {"kind": "EditObservation",
+                    "content": self._str_replace(args.get("path", ""),
+                                                 args.get("old_str", ""),
+                                                 args.get("new_str", ""))}
+        if name == "fetch_url":
+            return {"kind": "FetchObservation",
+                    "content": self._fetch(args.get("url", ""))}
+        if name == "code_audit":
+            from . import code_audit as _ca
+            r = _ca.scan_workspace(self.bridge.workspace, args.get("path", ""))
+            return {"kind": "AuditObservation",
+                    "content": json.dumps({k: r.get(k) for k in
+                                           ("grade", "total_findings", "by_severity")})}
+        if name == "run_tests":
+            from .ide_tools import TestKit
+            r = TestKit(self.bridge.workspace).run(args.get("path", "."))
+            return {"kind": "TestObservation", "content": json.dumps(
+                {k: r.get(k) for k in ("ok", "passed", "failed", "summary")})}
+        if name == "sdlc":
+            from .ide_tools import IDETools
+            tools = getattr(self, "_tools", None)
+            if tools is None:
+                from .sdlc import SDLCEngine, SDLCStore
+                import os as _os
+                st = SDLCStore(_os.path.join(self.bridge.workspace, ".pytrex", "sdlc.json"))
+                tools = IDETools(self.bridge.workspace,
+                                 SDLCEngine(self.bridge.workspace, st, self.bridge),
+                                 self.bridge)
+                self._tools = tools
+            r = tools.dispatch("sdlc", args)
+            return {"kind": "SDLCObservation", "content": json.dumps(
+                {"ok": r.get("ok"), "project": r.get("project"),
+                 "success": r.get("success"), "summary": r.get("summary")})}
+        if name == "autopilot":
+            from .ide_tools import IDETools
+            tools = getattr(self, "_tools", None)
+            if tools is None:
+                from .sdlc import SDLCEngine, SDLCStore
+                import os as _os
+                st = SDLCStore(_os.path.join(self.bridge.workspace, ".pytrex", "sdlc.json"))
+                tools = IDETools(self.bridge.workspace,
+                                 SDLCEngine(self.bridge.workspace, st, self.bridge),
+                                 self.bridge)
+                self._tools = tools
+            r = tools.dispatch("autopilot", args)
+            return {"kind": "AutopilotObservation", "content": json.dumps(
+                {"ok": r.get("ok"), "project": r.get("project"),
+                 "files": len(r.get("files", [])), "grade": r.get("grade")})}
+        if name == "git":
+            return {"kind": "GitObservation", "content": self._git(args)}
+        if name == "list_skills":
+            skills_dir = os.path.join(self.bridge.workspace, "ide", "skills")
+            from .canvas_services import SkillsSearch
+            r = SkillsSearch(skills_dir).search(args.get("query", ""), limit=30)
+            return {"kind": "SkillsObservation",
+                    "content": json.dumps([s["name"] for s in r["skills"]])}
         return {"kind": "ErrorObservation", "content": f"unknown tool: {name}"}
+
+    # ---------- tool helpers ----------
+
+    def _glob(self, pattern: str, path: str = "") -> List[str]:
+        import glob as _glob
+        base = os.path.join(self.bridge.workspace, path)
+        if not os.path.isdir(base):
+            base = self.bridge.workspace
+        hits = _glob.glob(os.path.join(base, pattern), recursive=True)
+        return [os.path.relpath(h, self.bridge.workspace) for h in hits[:200]]
+
+    def _grep(self, pattern: str, path: str = "", file_glob: str = "") -> List[dict]:
+        import re as _re
+        try:
+            rx = _re.compile(pattern)
+        except _re.error as e:
+            return [{"error": f"regex si sahihi: {e}"}]
+        base = os.path.join(self.bridge.workspace, path)
+        if not os.path.isdir(base):
+            base = self.bridge.workspace
+        out: List[dict] = []
+        for dirpath, dirnames, filenames in os.walk(base):
+            dirnames[:] = [d for d in dirnames if d not in
+                           {".git", "node_modules", "target", "__pycache__", ".venv"}]
+            for fn in filenames:
+                if file_glob and not fn.endswith(file_glob.lstrip("*")):
+                    continue
+                full = os.path.join(dirpath, fn)
+                try:
+                    if os.path.getsize(full) > 500_000:
+                        continue
+                    with open(full, "r", encoding="utf-8", errors="ignore") as fh:
+                        for i, line in enumerate(fh, 1):
+                            if rx.search(line):
+                                out.append({"file": os.path.relpath(full, self.bridge.workspace),
+                                            "line": i, "text": line.strip()[:200]})
+                                if len(out) >= 200:
+                                    return out
+                except OSError:
+                    continue
+        return out
+
+    def _str_replace(self, path: str, old: str, new: str) -> str:
+        full = os.path.join(self.bridge.workspace, path)
+        if not os.path.abspath(full).startswith(self.bridge.workspace):
+            return "path nje ya workspace"
+        try:
+            with open(full, "r", encoding="utf-8") as fh:
+                content = fh.read()
+        except OSError as e:
+            return f"haipatikani: {e}"
+        count = content.count(old)
+        if count == 0:
+            return "old_str haipo kwenye faili"
+        if count > 1:
+            return f"old_str inaonekana mara {count} — haijulikani ipi"
+        with open(full, "w", encoding="utf-8") as fh:
+            fh.write(content.replace(old, new, 1))
+        return f"imebadilishwa {path}"
+
+    def _fetch(self, url: str) -> str:
+        if not url.startswith(("http://", "https://")):
+            return "URL si sahihi"
+        try:
+            import urllib.request
+            req = urllib.request.Request(url, headers={"User-Agent": "T-PYTREXT/1.0"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return r.read(200_000).decode("utf-8", errors="ignore")
+        except Exception as e:  # noqa: BLE001
+            return f"fetch imeshindikana: {e}"
+
+    def _git(self, args: dict) -> str:
+        import subprocess
+        action = args.get("action", "status")
+        cmd = {"status": ["git", "status", "--porcelain"],
+               "diff": ["git", "diff"],
+               "log": ["git", "log", f"-{int(args.get('limit', 10))}", "--oneline"],
+               "commit": ["git", "commit", "-am", args.get("message", "agent commit")]}
+        c = cmd.get(action)
+        if not c:
+            return "action haijulikani"
+        try:
+            r = subprocess.run(c, cwd=self.bridge.workspace, capture_output=True,
+                               text=True, timeout=30)
+            return (r.stdout + r.stderr)[-2000:]
+        except OSError as e:
+            return str(e)
 
     # ---------- loop ----------
 
@@ -417,6 +740,12 @@ class AgentServer(IDEServer):
             "base_url": "",
         }
         self.runtime = AgentRuntime(self.store, self.bridge, self.llm_config)
+        skills_root = os.path.join(self.engine.home or self.workspace, "skills")
+        self.services = CanvasServices(
+            self.workspace,
+            os.path.join(self.workspace, ".pytrex"),
+            skills_root,
+        )
         self._ws_clients: List[Any] = []
         self._ws_lock = threading.Lock()
         self.started_at = time.time()
@@ -470,27 +799,167 @@ class AgentServer(IDEServer):
         if path == "/api/llm/models/verified":
             return {"models": {}}
         if path == "/api/llm/models":
-            return {"models": ["openai/gpt-4o-mini", "openai/gpt-4o",
-                               "anthropic/claude-sonnet-4-5-20250929",
-                               "anthropic/claude-haiku-4-5-20251001"]}
+            return self.services.config.search_models(
+                query.get("query", ""), query.get("provider", ""))
         if path == "/api/llm/providers":
-            return {"providers": []}
+            return self.services.config.search_providers(query.get("query", ""))
+        # ---- provider connections (CRUD) ----
+        if path == "/api/llm/provider-connections":
+            if method == "GET":
+                items = self.services.connections.list()
+                return {"provider_connections": items, "items": items,
+                        "total_count": len(items)}
+            if method == "POST":
+                p = self._json(body)
+                try:
+                    conn = self.services.connections.create(
+                        p.get("display_name", ""), p.get("provider", ""),
+                        p.get("api_key", ""), p.get("base_url"))
+                    return conn
+                except ValueError as e:
+                    return {"_status": 400, "_ctype": "application/json",
+                            "_raw": json.dumps({"detail": str(e)})}
+        if path.startswith("/api/llm/provider-connections/"):
+            cid = path.rsplit("/", 1)[-1]
+            try:
+                if method == "DELETE":
+                    return self.services.connections.delete(cid)
+                if method in ("PATCH", "PUT"):
+                    p = self._json(body)
+                    return self.services.connections.update(
+                        cid, p.get("display_name"), p.get("provider"),
+                        p.get("api_key"), p.get("base_url"))
+                if method == "GET":
+                    for c in self.services.connections.list():
+                        if c["id"] == cid:
+                            return c
+            except KeyError as e:
+                return {"_status": 404, "_ctype": "application/json",
+                        "_raw": json.dumps({"detail": str(e)})}
+        # ---- config search ----
+        if path in ("/api/v1/config/models/search", "/api/v1/config/models"):
+            return self.services.config.search_models(
+                query.get("query", ""), query.get("provider", ""))
+        if path in ("/api/v1/config/providers/search", "/api/v1/config/providers"):
+            return self.services.config.search_providers(query.get("query", ""))
+        # ---- secrets ----
+        if path in ("/api/settings/secrets", "/api/secrets"):
+            if method in ("PUT", "POST"):
+                p = self._json(body)
+                try:
+                    return self.services.secrets.upsert(
+                        p.get("name", ""), p.get("value", ""), p.get("description", ""))
+                except ValueError as e:
+                    return {"_status": 400, "_ctype": "application/json",
+                            "_raw": json.dumps({"detail": str(e)})}
+            items = self.services.secrets.list()
+            return {"secrets": items, "items": items}
+        if path.startswith("/api/settings/secrets/"):
+            name = path.rsplit("/", 1)[-1]
+            if method == "DELETE":
+                ok = self.services.secrets.delete(name)
+                return {"status": "ok" if ok else "not_found"}
+            if method == "GET":
+                val = self.services.secrets.get(name)
+                return {"name": name, "value": val} if val is not None else \
+                    {"_status": 404, "_ctype": "application/json",
+                     "_raw": json.dumps({"detail": "secret haipo"})}
+        if path == "/api/v1/secrets":
+            if method == "POST":
+                p = self._json(body)
+                try:
+                    return self.services.secrets.upsert(
+                        p.get("name", ""), p.get("value", ""), p.get("description", ""))
+                except ValueError as e:
+                    return {"_status": 400, "_ctype": "application/json",
+                            "_raw": json.dumps({"detail": str(e)})}
+            items = self.services.secrets.list()
+            return {"secrets": items, "items": items, "total_count": len(items)}
+        if path == "/api/v1/secrets/search":
+            return self.services.secrets.search(query.get("query", ""))
+        if path.startswith("/api/v1/secrets/"):
+            name = path.rsplit("/", 1)[-1]
+            if method in ("PUT", "PATCH"):
+                p = self._json(body)
+                return self.services.secrets.upsert(name, p.get("value", ""),
+                                                    p.get("description", ""))
+            if method == "DELETE":
+                return {"status": "ok" if self.services.secrets.delete(name) else "not_found"}
+        # ---- MCP ----
+        if path in ("/api/mcp/servers", "/api/v1/mcp/servers"):
+            if method == "POST":
+                p = self._json(body)
+                return self.services.mcp.add(p.get("name", ""), p.get("url", ""),
+                                             p.get("transport", "http"))
+            return {"servers": self.services.mcp.list(),
+                    "items": self.services.mcp.list()}
+        if path.startswith("/api/mcp/servers/"):
+            sid = path.rsplit("/", 1)[-1]
+            if method == "DELETE":
+                return {"status": "ok" if self.services.mcp.delete(sid) else "not_found"}
+        if path in ("/api/mcp/health", "/api/v1/mcp/health"):
+            return self.services.mcp.health(query.get("id", ""))
+        if path in ("/api/mcp/test", "/api/v1/mcp/test"):
+            return self.services.mcp.health(self._json(body).get("id", ""))
+        if path in ("/api/mcp/oauth/start", "/api/v1/mcp/oauth/start") and method == "POST":
+            return self.services.mcp.oauth_start(self._json(body).get("server", ""))
+        if path.startswith("/api/mcp/oauth/status/") or path.startswith("/api/v1/mcp/oauth/status/"):
+            return self.services.mcp.oauth_status(path.rsplit("/", 1)[-1])
+        # ---- sandboxes ----
+        if path in ("/api/v1/sandboxes", "/api/sandboxes"):
+            if method == "POST":
+                p = self._json(body)
+                return self.services.sandboxes.create(p.get("name", ""), p.get("image", "local"))
+            return {"sandboxes": self.services.sandboxes.list(),
+                    "items": self.services.sandboxes.list()}
+        if path.startswith("/api/v1/sandboxes/") or path.startswith("/api/sandboxes/"):
+            rest = path.rstrip("/").rsplit("/", 2)
+            sid = rest[-1] if rest[-1] not in ("pause", "resume") else rest[-2]
+            op = path.rstrip("/").rsplit("/", 1)[-1]
+            try:
+                if op == "pause":
+                    return self.services.sandboxes.pause(sid)
+                if op == "resume":
+                    return self.services.sandboxes.resume(sid)
+            except KeyError as e:
+                return {"_status": 404, "_ctype": "application/json",
+                        "_raw": json.dumps({"detail": str(e)})}
+        # ---- organizations ----
+        if path == "/api/organizations":
+            if method == "POST":
+                return self.services.organizations.create(self._json(body).get("name", ""))
+            return self.services.organizations.list()
+        if path.startswith("/api/organizations/"):
+            parts = path.split("/")
+            org_id = parts[3] if len(parts) > 3 else ""
+            tail = parts[4] if len(parts) > 4 else ""
+            try:
+                if tail == "profiles":
+                    return self.services.organizations.profiles(org_id)
+                if tail == "provider-connections":
+                    return self.services.organizations.provider_connections(org_id)
+                return {"organization": org_id}
+            except KeyError as e:
+                return {"_status": 404, "_ctype": "application/json",
+                        "_raw": json.dumps({"detail": str(e)})}
+        # ---- files ----
+        if path == "/api/file/download":
+            return self.services.files.download(query.get("path", ""))
+        if path == "/api/file/upload" and method == "POST":
+            p = self._json(body)
+            return self.services.files.upload(p.get("path", ""), p.get("content_base64", ""))
         if path == "/api/settings/agent-schema" or path == "/api/v1/settings/agent-schema":
             return self._agent_schema()
         if path == "/api/workspaces":
-            return {"workspaces": [], "workspaceParents": []}
+            return self.services.workspaces.list()
         if path == "/api/file/home":
-            return {"home": self.workspace,
-                    "favorites": [{"label": "Workspace", "path": self.workspace}],
-                    "locations": []}
+            return self.services.files.home()
         if path == "/api/skills" and method == "POST":
             return {"skills": []}
         if path == "/api/hooks":
             return {"hooks": []}
         if path == "/api/plugins/installed":
             return {"plugins": [], "items": []}
-        if path in ("/api/settings/secrets", "/api/secrets"):
-            return {"secrets": [], "items": []}
         if path == "/api/auth/workspace-session":
             return {"status": "ok"}
         if path in ("/api/automation/health", "/api/automation/v1"):
@@ -505,11 +974,11 @@ class AgentServer(IDEServer):
             return {"status": "ok"}
         if path == "/api/keys/current":
             return {"keys": [], "items": []}
-        if path == "/api/v1/secrets":
-            return {"secrets": [], "items": []}
         if path == "/api/v1/skills":
             return self._skills_payload()
-        if path == "/api/canvas-extensions" or path == "/api/canvas-extensions/installed":
+        if path == "/api/v1/skills/search":
+            return self.services.skills.search(query.get("query", ""))
+        if path in ("/api/canvas-extensions", "/api/canvas-extensions/installed"):
             return {"extensions": [], "items": []}
 
         # ---- conversations ----
@@ -538,17 +1007,67 @@ class AgentServer(IDEServer):
             convos = self.store.list()
             return {"items": [self._app_conversation(c) for c in convos],
                     "total_count": len(convos)}
+        if path == "/api/v1/app-conversations/search":
+            convos = self.store.list()
+            return {"items": [self._app_conversation(c) for c in convos],
+                    "total_count": len(convos)}
+        if path.startswith("/api/v1/app-conversations/"):
+            parts = [p for p in path.split("/") if p]
+            cid = parts[3] if len(parts) > 3 else ""
+            tail = parts[4] if len(parts) > 4 else ""
+            convo = self.store.get(cid)
+            if convo is None:
+                return {"_status": 404, "_ctype": "application/json",
+                        "_raw": json.dumps({"detail": "conversation haipo"})}
+            if not tail:
+                return self._app_conversation(convo)
+            if tail == "download":
+                return {"ok": True, "files": [e.get("id") for e in convo.snapshot()]}
+            if tail == "file" or tail == "files":
+                return {"ok": True, "files": []}
+            if tail == "skills":
+                return self._skills_payload()
+            if tail in ("switch_acp_model", "switch_profile") and method == "POST":
+                return {"status": "ok"}
+            if tail == "git":
+                sub = parts[5] if len(parts) > 5 else "changes"
+                return self.tools.dispatch("integrations",
+                                           {"action": f"git/{sub}" if sub != "git" else "git/changes"})
+        if path == "/api/admin/setup-state":
+            return {"setup_complete": True, "needs_setup": False,
+                    "llm_api_key_is_set": bool(self.llm_config.get("api_key"))}
+        if path in ("/api/shared-conversations", "/api/shared-events/search"):
+            return {"items": [], "total_count": 0}
+        if path == "/api/bash/execute_bash_command" and method == "POST":
+            p = self._json(body)
+            return self.bridge.terminal.run(p.get("command", ""),
+                                            int(p.get("timeout", 30)))
+        if path == "/api/cloud-proxy":
+            return {"ok": False, "error": "cloud proxy haipatikani (local mode)"}
+
+        # ---- SSE streams ----
+        if path in ("/api/sdlc/stream", "/api/sdlc/run/stream"):
+            return self._sse_sdlc(self._json(body))
+        if path in ("/api/autopilot/stream", "/api/autopilot/run/stream"):
+            return self._sse_autopilot(self._json(body))
+        if path in ("/api/ide/code/audit/stream", "/api/audit/stream"):
+            return self._sse_audit(self._json(body))
+        if path.startswith("/api/ide/") and path.endswith("/stream"):
+            tool = path[len("/api/ide/"):].rsplit("/", 1)[0].split("/")[0]
+            if tool in _IDE_TOOL_NAMES:
+                return self._sse_tool_stream(tool, self._json(body))
 
         # per-conversation routes
         if path.startswith("/api/conversations/"):
-            return self._conversation_route(method, path, body)
+            return self._conversation_route(method, path, body, query)
 
         # ---- everything else: IDE routes (super) ----
         return super()._route(method, path, query, body)
 
     # ---------- conversation sub-routes ----------
 
-    def _conversation_route(self, method: str, path: str, body: str) -> dict:
+    def _conversation_route(self, method: str, path: str, body: str,
+                            query: Optional[dict] = None) -> dict:
         rest = path[len("/api/conversations/"):]
         parts = rest.split("/")
         cid = parts[0]
@@ -564,11 +1083,30 @@ class AgentServer(IDEServer):
             self.store.delete(cid)
             return {"status": "ok"}
         if tail == ["events"] and method == "GET":
-            return {"items": convo.snapshot(), "total_count": len(convo.events)}
-        if tail == ["events", "search"]:
+            if self._wants_sse(query):
+                return self._sse_conversation(convo)
             return {"items": convo.snapshot(), "total_count": len(convo.events)}
         if tail == ["events", "count"]:
-            return len(convo.events)
+            return {"count": len(convo.events), "total_count": len(convo.events)}
+        if tail == ["events", "search"]:
+            return {"items": convo.snapshot(), "total_count": len(convo.events)}
+        if tail == ["events", "respond_to_confirmation"] and method == "POST":
+            return {"status": "ok", "accepted": True}
+        if tail == ["git", "changes"]:
+            return self.tools.dispatch("integrations", {"action": "git/changes"})
+        if tail == ["git", "diff"]:
+            return self.tools.dispatch("integrations", {"action": "git/diff"})
+        if tail == ["skills"]:
+            return self._skills_payload()
+        if tail and tail[0] == "workspace":
+            return {"ok": True, "working_dir": self.workspace}
+        if tail in (["switch_acp_model"], ["switch_profile"]) and method == "POST":
+            p = self._json(body)
+            if p.get("model"):
+                self.llm_config["model"] = p["model"]
+            if p.get("profile"):
+                self.llm_config["model"] = p["profile"]
+            return {"status": "ok"}
         if tail == ["events"] and method == "POST":
             payload = self._json(body)
             text = self._extract_text(payload)
@@ -606,9 +1144,79 @@ class AgentServer(IDEServer):
             return content[0].get("text", "")
         return ""
 
+    @staticmethod
+    def _wants_sse(query: dict) -> bool:
+        if not query:
+            return False
+        val = (query.get("stream") or query.get("sse") or "").lower()
+        return val in ("1", "true", "yes", "sse")
+
     def _start_run(self, convo: Conversation, text: str) -> None:
         t = threading.Thread(target=self.runtime.run, args=(convo, text), daemon=True)
         t.start()
+
+    # ---------- SSE streams ----------
+
+    def _sse_conversation(self, convo: Conversation) -> dict:
+        """Stream ya matukio ya mazungumzo (SSE halisi)."""
+        events = []
+        for ev in convo.snapshot():
+            events.append({"event": ev.get("kind", "event"), "data": ev})
+        if not events:
+            events.append({"event": "state", "data": {"agent_status": convo.agent_status}})
+        return {"_sse": True, "_sse_events": events}
+
+    def _sse_text_stream(self, events: List[dict]) -> dict:
+        return {"_sse": True, "_sse_events": events}
+
+    def _sse_sdlc(self, payload: dict) -> dict:
+        """Stream ya hatua za SDLC — kila awamu hutumwa anapokamilika."""
+        events: List[dict] = []
+        action = payload.get("action", "plan")
+        if action == "run":
+            result = self.tools.dispatch("sdlc", {**payload, "action": "run"})
+            for ph in result.get("phases", []):
+                events.append({"event": "phase", "data": {
+                    "id": ph.get("id"), "label": ph.get("label"),
+                    "status": ph.get("status")}})
+            events.append({"event": "done", "data": {
+                "ok": result.get("ok"), "project": result.get("project"),
+                "success": result.get("success"), "score": result.get("score")}})
+        else:
+            result = self.tools.dispatch("sdlc", {**payload, "action": "plan"})
+            for ph in result.get("phase_plan", []):
+                events.append({"event": "plan", "data": {"id": ph.get("id"),
+                                                         "depth": ph.get("depth")}})
+            events.append({"event": "done", "data": {"ok": result.get("ok")}})
+        return self._sse_text_stream(events)
+
+    def _sse_autopilot(self, payload: dict) -> dict:
+        result = self.tools.dispatch("autopilot", payload)
+        events = []
+        for st in result.get("steps", []):
+            events.append({"event": "step", "data": st})
+        events.append({"event": "done", "data": {
+            "ok": result.get("ok"), "project": result.get("project"),
+            "files": len(result.get("files", [])), "grade": result.get("grade")}})
+        return self._sse_text_stream(events)
+
+    def _sse_audit(self, payload: dict) -> dict:
+        result = self.tools.dispatch("audit", payload)
+        events = [{"event": "summary", "data": {
+            "grade": result.get("grade"), "total_findings": result.get("total_findings"),
+            "by_severity": result.get("by_severity")}}]
+        for f in (result.get("findings") or [])[:50]:
+            events.append({"event": "finding", "data": f})
+        events.append({"event": "done", "data": {"ok": result.get("ok")}})
+        return self._sse_text_stream(events)
+
+    def _sse_tool_stream(self, tool: str, payload: dict) -> dict:
+        """Stream ya zana yoyote: hutoa matokeo kama tukio moja."""
+        result = self.tools.dispatch(tool, payload)
+        return self._sse_text_stream([
+            {"event": "result", "data": result},
+            {"event": "done", "data": {"ok": result.get("ok", True)}},
+        ])
 
     def _settings_payload(self) -> dict:
         return {

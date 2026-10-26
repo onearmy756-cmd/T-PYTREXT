@@ -39,6 +39,12 @@ venv/
 # Database
 *.db
 
+# Runtime data (SDLC history, canvas store)
+.pytrex/
+
+# Generated projects (SDLC / Autopilot / Swarm output)
+/projects/
+
 # Logs
 *.log
 
